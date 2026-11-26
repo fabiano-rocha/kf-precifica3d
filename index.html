@@ -1542,11 +1542,24 @@
       const { clientPhone, waText } = buildQuoteData();
       const digits = (clientPhone || "").replace(/\D/g, "");
       const phoneParam = digits.length >= 10 ? (digits.startsWith("55") ? digits : "55" + digits) : "";
-      const baseUrl = "https://api.whatsapp.com/send";
+      const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+
+      if (navigator.clipboard?.writeText) {
+        navigator.clipboard.writeText(waText).catch(() => {});
+      }
+
+      const baseUrl = isMobile
+        ? "https://api.whatsapp.com/send"
+        : "https://web.whatsapp.com/send";
+
       const url = phoneParam
         ? `${baseUrl}?phone=${phoneParam}&text=${encodeURIComponent(waText)}`
         : `${baseUrl}?text=${encodeURIComponent(waText)}`;
+
       window.open(url, "_blank", "noopener,noreferrer");
+      if (!isMobile) {
+        showToast("Abrindo WhatsApp Web (texto tamb\u00e9m copiado no Ctrl+V).");
+      }
     }
 
     function printProposalWindow() {
