@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Precifica3D — Bambu Lab A1 + AMS</title>
+  <title>Precifica3D &mdash; Bambu Lab A1 + AMS</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js" defer></script>
   <style>
     :root {
@@ -55,11 +55,6 @@
       padding: 2px 8px;
       border-radius: 999px;
       font-weight: 600;
-    }
-    .badge.warn {
-      background: rgba(245, 158, 11, 0.18);
-      color: #fbbf24;
-      border-color: rgba(245, 158, 11, 0.4);
     }
     .header-actions { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
 
@@ -305,20 +300,20 @@
         <h1>Precifica3D <span class="badge">Bambu Lab A1 + AMS</span></h1>
       </div>
       <div class="header-actions">
-        <button id="cloudStatusBtn" class="btn btn-accent btn-sm" onclick="openCloudModal()">☁️ Configurar Nuvem</button>
-        <button class="btn btn-secondary btn-sm" onclick="syncFromCloud(true)" title="Atualizar da Planilha Google">🔄</button>
-        <button class="btn btn-secondary btn-sm" onclick="exportBackup()">⬇️ Backup</button>
+        <button id="cloudStatusBtn" class="btn btn-accent btn-sm" onclick="openCloudModal()">&#9729;&#65039; Configurar Nuvem</button>
+        <button class="btn btn-secondary btn-sm" onclick="syncFromCloud(true)" title="Atualizar da Planilha Google">&#128260;</button>
+        <button class="btn btn-secondary btn-sm" onclick="exportBackup()">&#11015;&#65039; Backup</button>
         <label class="btn btn-secondary btn-sm" style="margin:0; cursor:pointer;">
-          ⬆️ Restaurar
+          &#11014;&#65039; Restaurar
           <input type="file" accept=".json" style="display:none;" onchange="importBackup(event)" />
         </label>
       </div>
     </header>
 
     <nav class="tabs">
-      <button class="tab-btn active" data-tab="calc" onclick="switchTab('calc')">🧮 Calculadora</button>
-      <button class="tab-btn" data-tab="filaments" onclick="switchTab('filaments')">🧵 Filamentos (<span id="filamentCountBadge">0</span>)</button>
-      <button class="tab-btn" data-tab="projects" onclick="switchTab('projects')">📁 Projetos (<span id="projectCountBadge">0</span>)</button>
+      <button class="tab-btn active" data-tab="calc" onclick="switchTab('calc')">&#129518; Calculadora</button>
+      <button class="tab-btn" data-tab="filaments" onclick="switchTab('filaments')">&#129525; Filamentos (<span id="filamentCountBadge">0</span>)</button>
+      <button class="tab-btn" data-tab="projects" onclick="switchTab('projects')">&#128193; Projetos (<span id="projectCountBadge">0</span>)</button>
     </nav>
 
     <!-- ABA 1: CALCULADORA -->
@@ -326,25 +321,25 @@
       <div class="grid-main">
         <div>
           <div id="3mfDropzone" class="quick-bar">
-            <span style="flex:1;">⚡ <strong>Bambu Studio:</strong> arraste um <code>.gcode.3mf</code> ou importe:</span>
-            <button class="btn btn-secondary btn-sm" onclick="document.getElementById('3mfFileInput').click()">📂 Arquivo .3mf</button>
-            <button class="btn btn-accent btn-sm" onclick="openPasteModal()">📋 Colar Resumo</button>
+            <span style="flex:1;">&#9889; <strong>Bambu Studio:</strong> arraste um <code>.gcode.3mf</code> ou importe:</span>
+            <button class="btn btn-secondary btn-sm" onclick="document.getElementById('3mfFileInput').click()">&#128194; Arquivo .3mf</button>
+            <button class="btn btn-accent btn-sm" onclick="openPasteModal()">&#128203; Colar Resumo</button>
             <input type="file" id="3mfFileInput" accept=".3mf" style="display:none;" onchange="handle3mfFile(event.target.files[0])" />
           </div>
 
           <div class="card">
             <div class="card-title">
-              <span>📦 Projeto & Cliente</span>
+              <span>&#128230; Projeto &amp; Cliente</span>
               <div style="display:flex; gap:6px;">
-                <button class="btn btn-secondary btn-sm" onclick="resetCalculatorForm()">🆕 Novo</button>
-                <button class="btn btn-secondary btn-sm" onclick="document.getElementById('imgFileInput').click()">📷 Anexar Foto (ou Ctrl+V)</button>
+                <button class="btn btn-secondary btn-sm" onclick="resetCalculatorForm()">&#127381; Novo</button>
+                <button class="btn btn-secondary btn-sm" onclick="document.getElementById('imgFileInput').click()">&#128247; Anexar Foto (ou Ctrl+V)</button>
               </div>
               <input type="file" id="imgFileInput" accept="image/*" style="display:none;" onchange="handleImageFile(event.target.files[0])" />
             </div>
             <input type="hidden" id="editingProjectId" />
             <div class="form-grid">
               <div class="full">
-                <label>Nome da Peça / Projeto</label>
+                <label>Nome da Pe&ccedil;a / Projeto</label>
                 <input type="text" id="projectName" placeholder="Ex.: Chaveiro Personalizado" oninput="calculate()" />
               </div>
               <div>
@@ -358,14 +353,14 @@
             </div>
             <div id="imgChip" class="img-chip">
               <img id="imgPreview" src="" alt="Preview" onclick="openLightbox(this.src)" />
-              <span style="flex:1; font-size:0.78rem; color:var(--text-muted);">Foto otimizada para sincronização na nuvem</span>
-              <button class="btn btn-danger btn-sm" onclick="removeProjectImage()">✕</button>
+              <span style="flex:1; font-size:0.78rem; color:var(--text-muted);">Foto otimizada para sincroniza&ccedil;&atilde;o na nuvem</span>
+              <button class="btn btn-danger btn-sm" onclick="removeProjectImage()">&#10005;</button>
             </div>
           </div>
 
           <div class="card">
             <div class="card-title">
-              <span>🎨 Filamentos Usados por Cor (Peça + Purga/Torre em g)</span>
+              <span>&#127912; Filamentos Usados por Cor (Pe&ccedil;a + Purga/Torre em g)</span>
               <button class="btn btn-secondary btn-sm" onclick="addAmsRow()">+ Cor</button>
             </div>
             <div id="amsRowsContainer"></div>
@@ -375,14 +370,14 @@
                 <input type="number" id="extraWastePct" value="0" min="0" step="5" oninput="calculate()" />
               </div>
               <div>
-                <label>Peças na Mesa (Lote)</label>
+                <label>Pe&ccedil;as na Mesa (Lote)</label>
                 <input type="number" id="batchQty" value="1" min="1" step="1" oninput="calculate()" />
               </div>
             </div>
           </div>
 
           <div class="card">
-            <div class="card-title"><span>⏱️ Tempo, Acabamento & Venda</span></div>
+            <div class="card-title"><span>&#9201;&#65039; Tempo, Acabamento &amp; Venda</span></div>
             <div class="form-grid-3">
               <div>
                 <label>Horas</label>
@@ -408,7 +403,7 @@
                 <label>Canal de Venda</label>
                 <select id="salesChannel" onchange="calculate()">
                   <option value="0">Pix / Direto (0%)</option>
-                  <option value="4.5">Cartão (~4,5%)</option>
+                  <option value="4.5">Cart&atilde;o (~4,5%)</option>
                   <option value="14">Mercado Livre (~14%)</option>
                   <option value="20">Shopee (~20%)</option>
                 </select>
@@ -418,12 +413,12 @@
 
           <details class="settings-box">
             <summary>
-              <span>⚙️ Ajustes Fixos da Bambu A1 & Energia MT</span>
-              <span id="fixedSummaryLabel" style="color:var(--accent); font-size:0.78rem;">100W • R$ 1,19/kWh • Manut. R$ 0,80/h</span>
+              <span>&#9881;&#65039; Ajustes Fixos da Bambu A1 &amp; Energia MT</span>
+              <span id="fixedSummaryLabel" style="color:var(--accent); font-size:0.78rem;">100W &bull; R$ 1,19/kWh &bull; Manut. R$ 0,80/h</span>
             </summary>
             <div class="form-grid">
               <div>
-                <label>Consumo Médio A1 (W/h)</label>
+                <label>Consumo M&eacute;dio A1 (W/h)</label>
                 <input type="number" id="printerWatts" value="100" min="1" step="1" oninput="saveMachineSettings(); calculate();" />
               </div>
               <div>
@@ -431,11 +426,11 @@
                 <input type="number" id="kwhPrice" value="1.19" min="0" step="0.01" oninput="saveMachineSettings(); calculate();" />
               </div>
               <div>
-                <label>Manutenção / Bico (R$/h)</label>
+                <label>Manuten&ccedil;&atilde;o / Bico (R$/h)</label>
                 <input type="number" id="maintenanceRate" value="0.80" min="0" step="0.1" oninput="saveMachineSettings(); calculate();" />
               </div>
               <div>
-                <label>Hora Técnica Acabamento (R$)</label>
+                <label>Hora T&eacute;cnica Acabamento (R$)</label>
                 <input type="number" id="laborHourRate" value="25.00" min="0" step="1" oninput="saveMachineSettings(); calculate();" />
               </div>
             </div>
@@ -444,11 +439,11 @@
 
         <div class="sticky-panel">
           <div class="card">
-            <div class="card-title"><span>💰 Resumo & Orçamento</span></div>
+            <div class="card-title"><span>&#128176; Resumo &amp; Or&ccedil;amento</span></div>
             <div class="kpi-hero">
               <div class="kpi-row">
                 <div>
-                  <div class="kpi-sub">Preço Unitário</div>
+                  <div class="kpi-sub">Pre&ccedil;o Unit&aacute;rio</div>
                   <div id="unitPriceDisplay" class="kpi-price">R$ 0,00</div>
                 </div>
                 <div style="text-align:right;">
@@ -458,34 +453,34 @@
               </div>
               <div class="kpi-row" style="margin-top:8px; padding-top:8px; border-top:1px solid rgba(255,255,255,0.1);">
                 <span class="kpi-sub">Custo Unit.: <strong id="unitCostDisplay" style="color:#f1f5f9;">R$ 0,00</strong></span>
-                <span class="kpi-sub">Lucro Líquido: <strong id="netProfitDisplay" style="color:#10b981;">R$ 0,00</strong></span>
+                <span class="kpi-sub">Lucro L&iacute;quido: <strong id="netProfitDisplay" style="color:#10b981;">R$ 0,00</strong></span>
               </div>
             </div>
 
             <ul class="breakdown-list">
               <li><span>Filamento Total (<span id="partWeightSummary">0g</span>)</span><strong id="partFilCostDisplay">R$ 0,00</strong></li>
               <li><span>Energia (<span id="kwhSummary">0,00 kWh</span>)</span><strong id="energyCostDisplay">R$ 0,00</strong></li>
-              <li><span>Manutenção A1</span><strong id="maintCostDisplay">R$ 0,00</strong></li>
+              <li><span>Manuten&ccedil;&atilde;o A1</span><strong id="maintCostDisplay">R$ 0,00</strong></li>
               <li><span>Acabamento + Extras</span><strong id="laborExtraDisplay">R$ 0,00</strong></li>
               <li><span>Taxa Canal / Maquininha</span><strong id="channelFeeDisplay">R$ 0,00</strong></li>
             </ul>
 
             <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:12px;">
-              <button class="btn btn-primary" onclick="sendWhatsAppQuote()">📲 Enviar WhatsApp</button>
-              <button class="btn btn-accent" onclick="openQuoteOptionsModal()">🖨️ PDF / Proposta</button>
-              <button class="btn btn-secondary" onclick="saveCurrentProject()">💾 Salvar Projeto</button>
-              <button class="btn btn-warn" onclick="deductStockFromCurrent()">📉 Abater Estoque</button>
+              <button class="btn btn-primary" onclick="sendWhatsAppQuote()">&#128242; Enviar WhatsApp</button>
+              <button class="btn btn-accent" onclick="openQuoteOptionsModal()">&#128424;&#65039; PDF / Proposta</button>
+              <button class="btn btn-secondary" onclick="saveCurrentProject()">&#128190; Salvar Projeto</button>
+              <button class="btn btn-warn" onclick="deductStockFromCurrent()">&#128201; Abater Estoque</button>
             </div>
           </div>
 
           <div class="card">
-            <div class="card-title"><span>📊 Preço por Quantidade (Lote)</span></div>
+            <div class="card-title"><span>&#128202; Pre&ccedil;o por Quantidade (Lote)</span></div>
             <table>
               <thead>
                 <tr>
                   <th>Qtd.</th>
                   <th>Custo Unit.</th>
-                  <th>Preço Unit.</th>
+                  <th>Pre&ccedil;o Unit.</th>
                   <th>Total</th>
                 </tr>
               </thead>
@@ -499,7 +494,7 @@
     <!-- ABA 2: FILAMENTOS -->
     <section id="tab-filaments" class="tab-panel">
       <div class="card">
-        <div class="card-title"><span id="filamentFormTitle">➕ Cadastrar Rolo de Filamento (1 kg)</span></div>
+        <div class="card-title"><span id="filamentFormTitle">&#10133; Cadastrar Rolo de Filamento (1 kg)</span></div>
         <input type="hidden" id="editFilamentId" />
         <div class="form-grid-3">
           <div>
@@ -531,7 +526,7 @@
           </div>
           <div style="display:flex; gap:8px; align-items:flex-end;">
             <input type="color" id="filColor" value="#10b981" style="width:48px; height:38px; padding:2px;" title="Cor" />
-            <button class="btn btn-primary" style="flex:1;" onclick="saveFilament()">💾 Salvar</button>
+            <button class="btn btn-primary" style="flex:1;" onclick="saveFilament()">&#128190; Salvar</button>
             <button class="btn btn-secondary" onclick="resetFilamentForm()">Limpar</button>
           </div>
         </div>
@@ -539,7 +534,7 @@
 
       <div class="card">
         <div class="card-title">
-          <span>🧵 Rolos Cadastrados</span>
+          <span>&#129525; Rolos Cadastrados</span>
           <input type="text" id="searchFilament" placeholder="Filtrar..." style="max-width:220px;" oninput="renderFilaments()" />
         </div>
         <div id="filamentsGrid" class="cards-grid"></div>
@@ -550,7 +545,7 @@
     <section id="tab-projects" class="tab-panel">
       <div class="card">
         <div class="card-title">
-          <span>📁 Projetos Salvos</span>
+          <span>&#128193; Projetos Salvos</span>
           <input type="text" id="searchProject" placeholder="Buscar projeto ou cliente..." style="max-width:240px;" oninput="renderProjects()" />
         </div>
         <div id="projectsGrid" class="cards-grid"></div>
@@ -558,12 +553,12 @@
     </section>
   </div>
 
-  <!-- Modal Configuração Nuvem Google Sheets -->
+  <!-- Modal Configuracao Nuvem Google Sheets -->
   <div id="cloudModal" class="modal-backdrop">
     <div class="modal-box">
       <div class="card-title">
-        <span>☁️ Sincronização na Nuvem (Google Sheets)</span>
-        <button class="btn btn-secondary btn-sm" onclick="closeCloudModal()">✕</button>
+        <span>&#9729;&#65039; Sincroniza&ccedil;&atilde;o na Nuvem (Google Sheets)</span>
+        <button class="btn btn-secondary btn-sm" onclick="closeCloudModal()">&#10005;</button>
       </div>
       <p style="font-size:0.8rem; color:var(--text-muted); margin-bottom:10px;">
         Cole abaixo a <strong>URL do App da Web</strong> (terminada em <code>/exec</code>) gerada no Google Apps Script da sua planilha para sincronizar automaticamente entre PC e celular:
@@ -573,8 +568,8 @@
       <div style="display:flex; flex-wrap:wrap; gap:8px; justify-content:space-between;">
         <button class="btn btn-danger btn-sm" onclick="disconnectCloud()">Desconectar</button>
         <div style="display:flex; gap:8px;">
-          <button class="btn btn-secondary" onclick="pushAllToCloud()">⬆️ Enviar Dados Atuais</button>
-          <button class="btn btn-primary" onclick="connectAndSyncCloud()">Conectar & Baixar</button>
+          <button class="btn btn-secondary" onclick="pushAllToCloud()">&#11014;&#65039; Enviar Dados Atuais</button>
+          <button class="btn btn-primary" onclick="connectAndSyncCloud()">Conectar &amp; Baixar</button>
         </div>
       </div>
     </div>
@@ -584,11 +579,11 @@
   <div id="pasteModal" class="modal-backdrop">
     <div class="modal-box">
       <div class="card-title">
-        <span>📋 Colar Resumo do Bambu Studio</span>
-        <button class="btn btn-secondary btn-sm" onclick="closePasteModal()">✕</button>
+        <span>&#128203; Colar Resumo do Bambu Studio</span>
+        <button class="btn btn-secondary btn-sm" onclick="closePasteModal()">&#10005;</button>
       </div>
       <p style="font-size:0.8rem; color:var(--text-muted); margin-bottom:8px;">
-        Cole o resumo da aba <strong>Pré-visualização</strong> do Bambu Studio (tempo e gramas totais):
+        Cole o resumo da aba <strong>Pr&eacute;-visualiza&ccedil;&atilde;o</strong> do Bambu Studio (tempo e gramas totais):
       </p>
       <textarea id="bambuPasteText" rows="5" placeholder="Ex.: Total time: 1h 45m | Total: 54.2g"></textarea>
       <div style="display:flex; justify-content:flex-end; gap:8px; margin-top:10px;">
@@ -598,31 +593,31 @@
     </div>
   </div>
 
-  <!-- Modal Rápido de Proposta PDF / Texto -->
+  <!-- Modal Rapido de Proposta PDF / Texto -->
   <div id="quoteModal" class="modal-backdrop">
     <div class="modal-box">
       <div class="card-title">
-        <span>📄 Gerar Proposta Comercial</span>
-        <button class="btn btn-secondary btn-sm" onclick="closeQuoteModal()">✕</button>
+        <span>&#128196; Gerar Proposta Comercial</span>
+        <button class="btn btn-secondary btn-sm" onclick="closeQuoteModal()">&#10005;</button>
       </div>
       <div class="form-grid" style="margin-bottom:10px;">
         <div>
-          <label>Nome do Seu Estúdio</label>
-          <input type="text" id="studioName" value="Impressão 3D" />
+          <label>Nome do Seu Est&uacute;dio</label>
+          <input type="text" id="studioName" value="Impress&atilde;o 3D" />
         </div>
         <div>
           <label>Prazo de Entrega</label>
-          <input type="text" id="deliveryDays" value="3 dias úteis" />
+          <input type="text" id="deliveryDays" value="3 dias &uacute;teis" />
         </div>
         <div class="full">
-          <label>Observações / Pagamento</label>
-          <textarea id="quoteNotes" rows="2">Pagamento via Pix (50% no pedido e 50% na entrega) ou cartão.</textarea>
+          <label>Observa&ccedil;&otilde;es / Pagamento</label>
+          <textarea id="quoteNotes" rows="2">Pagamento via Pix (50% no pedido e 50% na entrega) ou cart&atilde;o.</textarea>
         </div>
       </div>
       <div style="display:flex; flex-wrap:wrap; gap:8px; justify-content:flex-end;">
-        <button class="btn btn-secondary" onclick="copyWhatsAppText()">📋 Copiar Texto</button>
-        <button class="btn btn-primary" onclick="sendWhatsAppQuote()">📲 WhatsApp</button>
-        <button class="btn btn-accent" onclick="printProposalWindow()">🖨️ Imprimir / PDF A4</button>
+        <button class="btn btn-secondary" onclick="copyWhatsAppText()">&#128203; Copiar Texto</button>
+        <button class="btn btn-primary" onclick="sendWhatsAppQuote()">&#128242; WhatsApp</button>
+        <button class="btn btn-accent" onclick="printProposalWindow()">&#128424;&#65039; Imprimir / PDF A4</button>
       </div>
     </div>
   </div>
@@ -636,7 +631,7 @@
 
   <script>
     // =========================================================================
-    // 1. BANCO INDEXEDDB LOCAL + SINCRONIZAÇÃO NUVEM (GOOGLE APPS SCRIPT)
+    // 1. BANCO INDEXEDDB LOCAL + SINCRONIZACAO NUVEM (GOOGLE APPS SCRIPT)
     // =========================================================================
     const DB_NAME = "Precifica3D_DB";
     const DB_VERSION = 1;
@@ -651,7 +646,7 @@
       function open() {
         if (dbPromise) return dbPromise;
         dbPromise = new Promise((resolve, reject) => {
-          if (!window.indexedDB) { reject(new Error("IndexedDB indisponível")); return; }
+          if (!window.indexedDB) { reject(new Error("IndexedDB indisponivel")); return; }
           const req = window.indexedDB.open(DB_NAME, DB_VERSION);
           req.onupgradeneeded = (e) => {
             const db = e.target.result;
@@ -713,7 +708,7 @@
       { id: "fil_1", name: "Branco Neve", material: "PLA", color: "#f8fafc", rollWeight: 1000, rollPrice: 109.90, stockGrams: 1000 },
       { id: "fil_2", name: "Preto Fosco", material: "PLA", color: "#1e293b", rollWeight: 1000, rollPrice: 115.00, stockGrams: 1000 },
       { id: "fil_3", name: "Vermelho", material: "PLA", color: "#ef4444", rollWeight: 1000, rollPrice: 129.00, stockGrams: 1000 },
-      { id: "fil_4", name: "Cinza Técnico", material: "PETG", color: "#64748b", rollWeight: 1000, rollPrice: 124.00, stockGrams: 1000 }
+      { id: "fil_4", name: "Cinza Tecnico", material: "PETG", color: "#64748b", rollWeight: 1000, rollPrice: 124.00, stockGrams: 1000 }
     ];
 
     let filaments = [];
@@ -768,7 +763,7 @@
     async function connectAndSyncCloud() {
       const url = document.getElementById("cloudScriptUrlInput").value.trim();
       if (!url || !url.startsWith("http")) {
-        showToast("Cole uma URL válida terminada em /exec.");
+        showToast("Cole uma URL v\u00e1lida terminada em /exec.");
         return;
       }
       localStorage.setItem(STORAGE_CLOUD_URL_KEY, url);
@@ -778,7 +773,7 @@
 
     function disconnectCloud() {
       localStorage.removeItem(STORAGE_CLOUD_URL_KEY);
-      updateCloudBadge("☁️ Configurar Nuvem", false);
+      updateCloudBadge("\u{2601}\u{FE0F} Configurar Nuvem", false);
       closeCloudModal();
       showToast("Nuvem desconectada (usando armazenamento local).");
     }
@@ -786,10 +781,10 @@
     async function syncFromCloud(notify = false) {
       const url = getCloudUrl();
       if (!url) {
-        updateCloudBadge("☁️ Configurar Nuvem", false);
+        updateCloudBadge("\u{2601}\u{FE0F} Configurar Nuvem", false);
         return;
       }
-      updateCloudBadge("⏳ Sincronizando...", true);
+      updateCloudBadge("\u{23F3} Sincronizando...", true);
       try {
         const resp = await fetch(url, { method: "GET" });
         const data = await resp.json();
@@ -813,28 +808,28 @@
           renderProjects();
           renderAmsRows();
           calculate();
-          updateCloudBadge("☁️ Nuvem Sincronizada", true);
+          updateCloudBadge("\u{2601}\u{FE0F} Nuvem Sincronizada", true);
           if (notify) showToast("Dados sincronizados com a Planilha Google!");
         } else {
-          updateCloudBadge("⚠️ Erro na Nuvem", false);
-          if (notify) showToast("Resposta inválida da planilha.");
+          updateCloudBadge("\u{26A0}\u{FE0F} Erro na Nuvem", false);
+          if (notify) showToast("Resposta inv\u00e1lida da planilha.");
         }
       } catch (err) {
-        updateCloudBadge("⚠️ Nuvem Offline", false);
-        if (notify) showToast("Não foi possível conectar à Planilha Google.");
+        updateCloudBadge("\u{26A0}\u{FE0F} Nuvem Offline", false);
+        if (notify) showToast("N\u00e3o foi poss\u00edvel conectar \u00e0 Planilha Google.");
       }
     }
 
     async function pushAllToCloud(silent = false) {
       const url = getCloudUrl();
       if (!url) return;
-      updateCloudBadge("⏳ Enviando...", true);
+      updateCloudBadge("\u{23F3} Enviando...", true);
       const settingsObj = {
         printerWatts: parseFloat(document.getElementById("printerWatts").value) || 100,
         kwhPrice: parseFloat(document.getElementById("kwhPrice").value) || 1.19,
         maintenanceRate: parseFloat(document.getElementById("maintenanceRate").value) || 0.80,
         laborHourRate: parseFloat(document.getElementById("laborHourRate").value) || 25,
-        studioName: document.getElementById("studioName").value || "Impressão 3D"
+        studioName: document.getElementById("studioName").value || "Impress\u00e3o 3D"
       };
       try {
         await fetch(url, {
@@ -847,10 +842,10 @@
             settings: settingsObj
           })
         });
-        updateCloudBadge("☁️ Nuvem Sincronizada", true);
+        updateCloudBadge("\u{2601}\u{FE0F} Nuvem Sincronizada", true);
         if (!silent) showToast("Dados enviados para a Planilha Google!");
       } catch (err) {
-        updateCloudBadge("⚠️ Erro ao Enviar", false);
+        updateCloudBadge("\u{26A0}\u{FE0F} Erro ao Enviar", false);
         if (!silent) showToast("Falha ao enviar para a nuvem.");
       }
     }
@@ -898,7 +893,7 @@
           kwhPrice: parseFloat(document.getElementById("kwhPrice").value) || 1.19,
           maintenanceRate: parseFloat(document.getElementById("maintenanceRate").value) || 0.80,
           laborHourRate: parseFloat(document.getElementById("laborHourRate").value) || 25,
-          studioName: document.getElementById("studioName").value || "Impressão 3D"
+          studioName: document.getElementById("studioName").value || "Impress\u00e3o 3D"
         };
         localStorage.setItem(STORAGE_SETTINGS_KEY, JSON.stringify(data));
       } catch (e) {}
@@ -910,7 +905,7 @@
       const w = document.getElementById("printerWatts").value || 100;
       const kwh = parseFloat(document.getElementById("kwhPrice").value || 1.19).toFixed(2).replace(".", ",");
       const m = parseFloat(document.getElementById("maintenanceRate").value || 0.80).toFixed(2).replace(".", ",");
-      document.getElementById("fixedSummaryLabel").textContent = `${w}W • R$ ${kwh}/kWh • Manut. R$ ${m}/h`;
+      document.getElementById("fixedSummaryLabel").textContent = `${w}W \u2022 R$ ${kwh}/kWh \u2022 Manut. R$ ${m}/h`;
     }
 
     function persistFilaments() {
@@ -927,7 +922,7 @@
     }
 
     // =========================================================================
-    // 4. LINHAS AMS & CÁLCULOS
+    // 4. LINHAS AMS & CALCULOS
     // =========================================================================
     function ensureFilamentExists(filId, fallbackName = "Filamento Restaurado", fallbackCostPerGram = 0.11) {
       let found = filaments.find(f => f.id === filId);
@@ -976,7 +971,7 @@
           const opt = document.createElement("option");
           opt.value = f.id;
           const perKg = f.rollWeight > 0 ? (f.rollPrice / (f.rollWeight / 1000)) : 0;
-          opt.textContent = `${f.name} (${f.material} • ${formatBRL(perKg)}/kg)`;
+          opt.textContent = `${f.name} (${f.material} \u2022 ${formatBRL(perKg)}/kg)`;
           if (f.id === row.filamentId) opt.selected = true;
           sel.appendChild(opt);
         });
@@ -992,7 +987,7 @@
 
         const btn = document.createElement("button");
         btn.className = "btn btn-danger btn-sm";
-        btn.textContent = "✕";
+        btn.textContent = "\u2715";
         btn.onclick = () => removeAmsRow(row.uid);
 
         div.appendChild(sel);
@@ -1108,7 +1103,7 @@
     }
 
     // =========================================================================
-    // 5. COMPRESSÃO DE IMAGEM PARA GOOGLE SHEETS (<= 360PX, ~15-22 KB)
+    // 5. COMPRESSAO DE IMAGEM PARA GOOGLE SHEETS (<= 360PX, ~15-22 KB)
     // =========================================================================
     function compressImageDataUrl(dataUrl, maxDim = 360, quality = 0.65) {
       return new Promise((resolve, reject) => {
@@ -1216,7 +1211,7 @@
         }
         calculate();
         showToast("Arquivo .3mf importado!");
-      } catch (e) { showToast("Não foi possível ler o .3mf."); }
+      } catch (e) { showToast("N\u00e3o foi poss\u00edvel ler o .3mf."); }
     }
 
     function openPasteModal() { document.getElementById("pasteModal").classList.add("open"); }
@@ -1229,7 +1224,7 @@
       if (h) document.getElementById("printHours").value = parseInt(h[1], 10);
       if (m) document.getElementById("printMinutes").value = parseInt(m[1], 10);
 
-      const totalMatch = txt.match(/(?:Total|Model|Peça)\s*:?\s*([\d.,]+)\s*g/i);
+      const totalMatch = txt.match(/(?:Total|Model|Pe\u00e7a)\s*:?\s*([\d.,]+)\s*g/i);
       if (totalMatch && amsRows[0]) {
         amsRows[0].grams = parseFloat(totalMatch[1].replace(",", ".")) || 0;
         renderAmsRows();
@@ -1277,7 +1272,7 @@
       document.getElementById("filRollWeight").value = f.rollWeight;
       document.getElementById("filRollPrice").value = f.rollPrice;
       document.getElementById("filStockGrams").value = f.stockGrams;
-      document.getElementById("filamentFormTitle").textContent = "✏️ Editando: " + f.name;
+      document.getElementById("filamentFormTitle").textContent = "\u270F\uFE0F Editando: " + f.name;
     }
 
     function deleteFilament(id) {
@@ -1287,7 +1282,7 @@
       renderFilaments();
       renderAmsRows();
       calculate();
-      showToast("Filamento excluído.");
+      showToast("Filamento exclu\u00eddo.");
     }
 
     function resetFilamentForm() {
@@ -1296,7 +1291,7 @@
       document.getElementById("filRollPrice").value = "110.00";
       document.getElementById("filRollWeight").value = "1000";
       document.getElementById("filStockGrams").value = "1000";
-      document.getElementById("filamentFormTitle").textContent = "➕ Cadastrar Rolo de Filamento (1 kg)";
+      document.getElementById("filamentFormTitle").textContent = "\u2795 Cadastrar Rolo de Filamento (1 kg)";
     }
 
     function renderFilaments() {
@@ -1323,8 +1318,8 @@
               </div>
             </div>
             <div style="display:flex; gap:6px;">
-              <button class="btn btn-secondary btn-sm" style="flex:1;" onclick="editFilament('${f.id}')">✏️ Editar</button>
-              <button class="btn btn-danger btn-sm" onclick="deleteFilament('${f.id}')">🗑️</button>
+              <button class="btn btn-secondary btn-sm" style="flex:1;" onclick="editFilament('${f.id}')">\u270F\uFE0F Editar</button>
+              <button class="btn btn-danger btn-sm" onclick="deleteFilament('${f.id}')">\u{1F5D1}\uFE0F</button>
             </div>
           `;
           grid.appendChild(card);
@@ -1362,7 +1357,7 @@
       document.getElementById("profitMargin").value = 100;
       document.getElementById("salesChannel").value = "0";
       calculate();
-      showToast("Formulário limpo para novo projeto.");
+      showToast("Formul\u00e1rio limpo para novo projeto.");
     }
 
     async function saveCurrentProject() {
@@ -1374,7 +1369,7 @@
         id: projId,
         updatedAt: now,
         createdAt: new Date().toLocaleDateString("pt-BR"),
-        name: document.getElementById("projectName").value.trim() || "Peça 3D",
+        name: document.getElementById("projectName").value.trim() || "Pe\u00e7a 3D",
         clientName: document.getElementById("clientName").value.trim(),
         clientPhone: document.getElementById("clientPhone").value.trim(),
         image: currentProjectImage,
@@ -1459,7 +1454,7 @@
       document.getElementById("projectCountBadge").textContent = projects.length;
       renderProjects();
       await pushAllToCloud(true);
-      showToast("Projeto excluído.");
+      showToast("Projeto exclu\u00eddo.");
     }
 
     function renderProjects() {
@@ -1481,14 +1476,14 @@
               <strong>${p.name}</strong>
               <span style="font-size:0.74rem; color:var(--text-muted);">${p.createdAt || ""}</span>
             </div>
-            ${(p.clientName || p.clientPhone) ? `<div style="font-size:0.78rem; color:var(--accent); margin-top:3px;">👤 ${p.clientName || "Cliente"} ${p.clientPhone ? "• " + p.clientPhone : ""}</div>` : ""}
+            ${(p.clientName || p.clientPhone) ? `<div style="font-size:0.78rem; color:var(--accent); margin-top:3px;">\u{1F464} ${p.clientName || "Cliente"} ${p.clientPhone ? "\u2022 " + p.clientPhone : ""}</div>` : ""}
             <div style="font-size:0.82rem; margin-top:5px;">
-              ${p.batchQty}x • Unit.: <strong style="color:var(--primary);">${formatBRL(p.unitFinalPrice)}</strong> • Total: <strong>${formatBRL(p.totalFinalPrice)}</strong>
+              ${p.batchQty}x \u2022 Unit.: <strong style="color:var(--primary);">${formatBRL(p.unitFinalPrice)}</strong> \u2022 Total: <strong>${formatBRL(p.totalFinalPrice)}</strong>
             </div>
           </div>
           <div style="display:flex; gap:6px;">
-            <button class="btn btn-primary btn-sm" style="flex:1;" onclick="loadProject('${p.id}')">📂 Abrir</button>
-            <button class="btn btn-danger btn-sm" onclick="deleteProject('${p.id}')">🗑️</button>
+            <button class="btn btn-primary btn-sm" style="flex:1;" onclick="loadProject('${p.id}')">\u{1F4C2} Abrir</button>
+            <button class="btn btn-danger btn-sm" onclick="deleteProject('${p.id}')">\u{1F5D1}\uFE0F</button>
           </div>
         `;
         grid.appendChild(card);
@@ -1496,33 +1491,33 @@
     }
 
     // =========================================================================
-    // 8. ORÇAMENTO WHATSAPP & IMPRESSÃO A4
+    // 8. ORCAMENTO WHATSAPP (UNICODE BLINDADO) & IMPRESSAO A4
     // =========================================================================
     function openQuoteOptionsModal() { document.getElementById("quoteModal").classList.add("open"); }
     function closeQuoteModal() { document.getElementById("quoteModal").classList.remove("open"); }
 
     function buildQuoteData() {
-      const studio = document.getElementById("studioName").value.trim() || "Impressão 3D";
-      const project = document.getElementById("projectName").value.trim() || "Peça Personalizada em Impressão 3D";
+      const studio = document.getElementById("studioName").value.trim() || "Impress\u00e3o 3D";
+      const project = document.getElementById("projectName").value.trim() || "Pe\u00e7a Personalizada em Impress\u00e3o 3D";
       const clientName = document.getElementById("clientName").value.trim();
       const clientPhone = document.getElementById("clientPhone").value.trim();
-      const delivery = document.getElementById("deliveryDays").value.trim() || "3 dias úteis";
+      const delivery = document.getElementById("deliveryDays").value.trim() || "3 dias \u00fateis";
       const notes = document.getElementById("quoteNotes").value.trim();
       const qty = lastCalc.batchQty || 1;
       const unitPrice = formatBRL(lastCalc.unitFinalPrice || 0);
       const totalPrice = formatBRL(lastCalc.totalFinalPrice || 0);
 
-      const greeting = clientName ? `Olá, *${clientName}*! Segue o orçamento:` : `Olá! Segue o orçamento:`;
+      const greeting = clientName ? `Ol\u00e1, *${clientName}*! Segue o or\u00e7amento:` : `Ol\u00e1! Segue o or\u00e7amento:`;
       const waText = [
         `*${studio}*`,
         greeting,
         ``,
-        `📦 *Item:* ${project}`,
-        `🔢 *Quantidade:* ${qty} un.`,
-        `💵 *Unitário:* ${unitPrice}`,
-        `💰 *Total:* *${totalPrice}*`,
-        `⏱️ *Prazo:* ${delivery}`,
-        notes ? `📝 ${notes}` : ``
+        `\u{1F4E6} *Item:* ${project}`,
+        `\u{1F522} *Quantidade:* ${qty} un.`,
+        `\u{1F4B5} *Unit\u00e1rio:* ${unitPrice}`,
+        `\u{1F4B0} *Total:* *${totalPrice}*`,
+        `\u{23F1}\u{FE0F} *Prazo:* ${delivery}`,
+        notes ? `\u{1F4DD} ${notes}` : ``
       ].filter(Boolean).join("\n");
 
       return { studio, project, clientName, clientPhone, delivery, notes, qty, unitPrice, totalPrice, waText };
@@ -1532,6 +1527,14 @@
       const { waText } = buildQuoteData();
       if (navigator.clipboard?.writeText) {
         navigator.clipboard.writeText(waText).then(() => showToast("Texto copiado!"));
+      } else {
+        const ta = document.createElement("textarea");
+        ta.value = waText;
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand("copy");
+        document.body.removeChild(ta);
+        showToast("Texto copiado!");
       }
     }
 
@@ -1539,9 +1542,10 @@
       const { clientPhone, waText } = buildQuoteData();
       const digits = (clientPhone || "").replace(/\D/g, "");
       const phoneParam = digits.length >= 10 ? (digits.startsWith("55") ? digits : "55" + digits) : "";
+      const baseUrl = "https://api.whatsapp.com/send";
       const url = phoneParam
-        ? `https://wa.me/${phoneParam}?text=${encodeURIComponent(waText)}`
-        : `https://wa.me/?text=${encodeURIComponent(waText)}`;
+        ? `${baseUrl}?phone=${phoneParam}&text=${encodeURIComponent(waText)}`
+        : `${baseUrl}?text=${encodeURIComponent(waText)}`;
       window.open(url, "_blank", "noopener,noreferrer");
     }
 
@@ -1553,7 +1557,7 @@
         <html lang="pt-BR">
         <head>
           <meta charset="UTF-8" />
-          <title>Orçamento - ${q.project}</title>
+          <title>Or&ccedil;amento - ${q.project}</title>
           <style>
             body { font-family: Arial, sans-serif; color: #1e293b; padding: 34px; max-width: 760px; margin: 0 auto; }
             .top { display: flex; justify-content: space-between; border-bottom: 2px solid #10b981; padding-bottom: 12px; margin-bottom: 18px; }
@@ -1568,17 +1572,17 @@
         </head>
         <body>
           <div class="top">
-            <div><h1>${q.studio}</h1><div style="font-size:12px; color:#64748b;">Orçamento — Impressão 3D</div></div>
+            <div><h1>${q.studio}</h1><div style="font-size:12px; color:#64748b;">Or&ccedil;amento &mdash; Impress&atilde;o 3D</div></div>
             <div style="text-align:right; font-size:12px;"><strong>Data:</strong> ${new Date().toLocaleDateString("pt-BR")}<br/><strong>Prazo:</strong> ${q.delivery}</div>
           </div>
-          ${(q.clientName || q.clientPhone) ? `<div class="box"><strong>Cliente:</strong> ${q.clientName || "-"} ${q.clientPhone ? "• " + q.clientPhone : ""}</div>` : ""}
+          ${(q.clientName || q.clientPhone) ? `<div class="box"><strong>Cliente:</strong> ${q.clientName || "-"} ${q.clientPhone ? "&bull; " + q.clientPhone : ""}</div>` : ""}
           ${currentProjectImage ? `<img src="${currentProjectImage}" alt="Produto" />` : ""}
           <table>
-            <thead><tr><th>Descrição</th><th>Qtd.</th><th>Unitário</th><th>Subtotal</th></tr></thead>
+            <thead><tr><th>Descri&ccedil;&atilde;o</th><th>Qtd.</th><th>Unit&aacute;rio</th><th>Subtotal</th></tr></thead>
             <tbody><tr><td>${q.project}</td><td>${q.qty} un.</td><td>${q.unitPrice}</td><td><strong>${q.totalPrice}</strong></td></tr></tbody>
           </table>
           <div class="total">Total: ${q.totalPrice}</div>
-          <p style="margin-top:20px; font-size:12.5px; color:#475569;"><strong>Observações:</strong> ${q.notes}</p>
+          <p style="margin-top:20px; font-size:12.5px; color:#475569;"><strong>Observa&ccedil;&otilde;es:</strong> ${q.notes}</p>
           <script>window.onload = function() { window.print(); };<\/script>
         </body>
         </html>
@@ -1602,7 +1606,7 @@
     // 9. BACKUP JSON & BOOTSTRAP
     // =========================================================================
     function exportBackup() {
-      const payload = { version: "4.0-cloud", exportedAt: new Date().toISOString(), filaments, projects };
+      const payload = { version: "4.1-unicode-cloud", exportedAt: new Date().toISOString(), filaments, projects };
       const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
       const a = document.createElement("a");
       a.href = URL.createObjectURL(blob);
@@ -1633,7 +1637,7 @@
           renderAmsRows();
           calculate();
           showToast("Backup restaurado!");
-        } catch (err) { showToast("Arquivo inválido."); }
+        } catch (err) { showToast("Arquivo inv\u00e1lido."); }
       };
       reader.readAsText(file);
     }
