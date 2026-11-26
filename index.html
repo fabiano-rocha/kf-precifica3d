@@ -1548,18 +1548,20 @@
         navigator.clipboard.writeText(waText).catch(() => {});
       }
 
-      const baseUrl = isMobile
-        ? "https://api.whatsapp.com/send"
-        : "https://web.whatsapp.com/send";
-
-      const url = phoneParam
-        ? `${baseUrl}?phone=${phoneParam}&text=${encodeURIComponent(waText)}`
-        : `${baseUrl}?text=${encodeURIComponent(waText)}`;
-
-      window.open(url, "_blank", "noopener,noreferrer");
-      if (!isMobile) {
-        showToast("Abrindo WhatsApp Web (texto tamb\u00e9m copiado no Ctrl+V).");
+      if (isMobile) {
+        const mobileUrl = phoneParam
+          ? `https://api.whatsapp.com/send?phone=${phoneParam}&text=${encodeURIComponent(waText)}`
+          : `https://api.whatsapp.com/send?text=${encodeURIComponent(waText)}`;
+        window.open(mobileUrl, "_blank", "noopener,noreferrer");
+        return;
       }
+
+      const webUrl = phoneParam
+        ? `https://web.whatsapp.com/send/?phone=${phoneParam}&text=${encodeURIComponent(waText)}&type=phone_number&app_absent=0`
+        : `https://web.whatsapp.com/send/?text=${encodeURIComponent(waText)}&app_absent=0`;
+
+      window.open(webUrl, "_blank", "noopener,noreferrer");
+      showToast("Abrindo conversa no WhatsApp Web...");
     }
 
     function printProposalWindow() {
