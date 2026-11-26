@@ -56,6 +56,15 @@
       border-radius: 999px;
       font-weight: 600;
     }
+    .badge-internal {
+      background: rgba(245, 158, 11, 0.16);
+      color: #fbbf24;
+      border: 1px solid rgba(245, 158, 11, 0.35);
+      font-size: 0.7rem;
+      padding: 1px 7px;
+      border-radius: 999px;
+      font-weight: 600;
+    }
     .header-actions { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
 
     .tabs { display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; }
@@ -118,8 +127,11 @@
       border-radius: 8px;
       font-size: 0.88rem;
       outline: none;
+      font-family: inherit;
     }
     input:focus, select:focus, textarea:focus { border-color: var(--primary); }
+    textarea.internal-note { border-color: rgba(245, 158, 11, 0.35); }
+    textarea.internal-note:focus { border-color: var(--warn); }
 
     .btn {
       display: inline-flex;
@@ -249,6 +261,17 @@
       border: 1px solid rgba(255,255,255,0.4);
       vertical-align: middle;
       margin-right: 6px;
+    }
+
+    .internal-preview-box {
+      background: rgba(245, 158, 11, 0.1);
+      border: 1px dashed rgba(245, 158, 11, 0.4);
+      color: #fde68a;
+      font-size: 0.75rem;
+      padding: 6px 8px;
+      border-radius: 6px;
+      margin-top: 6px;
+      white-space: pre-wrap;
     }
 
     .modal-backdrop {
@@ -411,6 +434,21 @@
             </div>
           </div>
 
+          <!-- OBSERVACOES DO CLIENTE E OBSERVACOES INTERNAS -->
+          <div class="card">
+            <div class="card-title"><span>&#128221; Observa&ccedil;&otilde;es &amp; Pagamento</span></div>
+            <div class="form-grid">
+              <div class="full">
+                <label>Observa&ccedil;&otilde;es / Pagamento <span class="badge" style="margin-left:4px;">Vai no WhatsApp e no PDF</span></label>
+                <textarea id="quoteNotes" rows="2">Pagamento via Pix (50% no pedido e 50% na entrega) ou cart&atilde;o.</textarea>
+              </div>
+              <div class="full">
+                <label>Observa&ccedil;&otilde;es Internas <span class="badge-internal" style="margin-left:4px;">Somente interno &bull; n&atilde;o vai ao cliente</span></label>
+                <textarea id="internalNotes" class="internal-note" rows="2" placeholder="Anota&ccedil;&otilde;es internas de produ&ccedil;&atilde;o, fatiamento, bico, suportes ou detalhes do pedido..."></textarea>
+              </div>
+            </div>
+          </div>
+
           <details class="settings-box">
             <summary>
               <span>&#9881;&#65039; Ajustes Fixos da Bambu A1 &amp; Energia MT</span>
@@ -546,7 +584,7 @@
       <div class="card">
         <div class="card-title">
           <span>&#128193; Projetos Salvos</span>
-          <input type="text" id="searchProject" placeholder="Buscar projeto ou cliente..." style="max-width:240px;" oninput="renderProjects()" />
+          <input type="text" id="searchProject" placeholder="Buscar projeto, cliente ou nota interna..." style="max-width:260px;" oninput="renderProjects()" />
         </div>
         <div id="projectsGrid" class="cards-grid"></div>
       </div>
@@ -600,7 +638,7 @@
         <span>&#128196; Gerar Proposta Comercial</span>
         <button class="btn btn-secondary btn-sm" onclick="closeQuoteModal()">&#10005;</button>
       </div>
-      <div class="form-grid" style="margin-bottom:10px;">
+      <div class="form-grid" style="margin-bottom:12px;">
         <div>
           <label>Nome do Seu Est&uacute;dio</label>
           <input type="text" id="studioName" value="Impress&atilde;o 3D" />
@@ -609,11 +647,10 @@
           <label>Prazo de Entrega</label>
           <input type="text" id="deliveryDays" value="3 dias &uacute;teis" />
         </div>
-        <div class="full">
-          <label>Observa&ccedil;&otilde;es / Pagamento</label>
-          <textarea id="quoteNotes" rows="2">Pagamento via Pix (50% no pedido e 50% na entrega) ou cart&atilde;o.</textarea>
-        </div>
       </div>
+      <p style="font-size:0.78rem; color:var(--text-muted); margin-bottom:12px;">
+        As <strong>Observa&ccedil;&otilde;es / Pagamento</strong> da tela principal ser&atilde;o inclu&iacute;das automaticamente. As <em>Observa&ccedil;&otilde;es Internas</em> permanecem ocultas.
+      </p>
       <div style="display:flex; flex-wrap:wrap; gap:8px; justify-content:flex-end;">
         <button class="btn btn-secondary" onclick="copyWhatsAppText()">&#128203; Copiar Texto</button>
         <button class="btn btn-primary" onclick="sendWhatsAppQuote()">&#128242; WhatsApp</button>
@@ -640,6 +677,8 @@
     const STORAGE_FILAMENTS_KEY = "precifica3d_filaments_v1";
     const STORAGE_SETTINGS_KEY = "precifica3d_settings_v1";
     const STORAGE_CLOUD_URL_KEY = "precifica3d_cloud_url_v1";
+
+    const DEFAULT_QUOTE_NOTES = "Pagamento via Pix (50% no pedido e 50% na entrega) ou cart\u00e3o.";
 
     const ProjectDB = (() => {
       let dbPromise = null;
@@ -737,6 +776,14 @@
       else if (v.length > 2) v = v.replace(/^(\d{2})(\d{0,5})/, "($1) $2");
       else if (v.length > 0) v = v.replace(/^(\d*)/, "($1");
       input.value = v;
+    }
+
+    function escapeHtml(str) {
+      return String(str || "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;");
     }
 
     // =========================================================================
@@ -1307,8 +1354,8 @@
           card.innerHTML = `
             <div>
               <div style="display:flex; justify-content:space-between; align-items:center;">
-                <strong><span class="color-dot" style="background:${f.color}"></span>${f.name}</strong>
-                <span class="badge">${f.material}</span>
+                <strong><span class="color-dot" style="background:${f.color}"></span>${escapeHtml(f.name)}</strong>
+                <span class="badge">${escapeHtml(f.material)}</span>
               </div>
               <div style="font-size:0.82rem; color:var(--text-muted); margin-top:5px;">
                 Rolo ${f.rollWeight}g: <strong>${formatBRL(f.rollPrice)}</strong> (${formatBRL(perKg)}/kg)
@@ -1356,6 +1403,8 @@
       document.getElementById("extraCost").value = "0.00";
       document.getElementById("profitMargin").value = 100;
       document.getElementById("salesChannel").value = "0";
+      document.getElementById("quoteNotes").value = DEFAULT_QUOTE_NOTES;
+      document.getElementById("internalNotes").value = "";
       calculate();
       showToast("Formul\u00e1rio limpo para novo projeto.");
     }
@@ -1390,6 +1439,8 @@
         extraCost: parseFloat(document.getElementById("extraCost").value) || 0,
         profitMargin: parseFloat(document.getElementById("profitMargin").value) || 100,
         salesChannel: document.getElementById("salesChannel").value,
+        quoteNotes: document.getElementById("quoteNotes").value.trim(),
+        internalNotes: document.getElementById("internalNotes").value.trim(),
         unitFinalPrice: lastCalc.unitFinalPrice || 0,
         totalFinalPrice: lastCalc.totalFinalPrice || 0
       };
@@ -1435,6 +1486,8 @@
       document.getElementById("extraCost").value = p.extraCost || 0;
       document.getElementById("profitMargin").value = p.profitMargin || 100;
       document.getElementById("salesChannel").value = p.salesChannel || "0";
+      document.getElementById("quoteNotes").value = typeof p.quoteNotes === "string" ? p.quoteNotes : DEFAULT_QUOTE_NOTES;
+      document.getElementById("internalNotes").value = p.internalNotes || "";
 
       calculate();
       switchTab("calc");
@@ -1461,7 +1514,7 @@
       const q = (document.getElementById("searchProject").value || "").toLowerCase();
       const grid = document.getElementById("projectsGrid");
       grid.innerHTML = "";
-      const list = projects.filter(p => `${p.name} ${p.clientName || ""} ${p.clientPhone || ""}`.toLowerCase().includes(q));
+      const list = projects.filter(p => `${p.name} ${p.clientName || ""} ${p.clientPhone || ""} ${p.internalNotes || ""}`.toLowerCase().includes(q));
       if (!list.length) {
         grid.innerHTML = `<p style="color:var(--text-muted); font-size:0.85rem;">Nenhum projeto salvo.</p>`;
         return;
@@ -1473,13 +1526,14 @@
           <div>
             ${p.image ? `<img src="${p.image}" onclick="openLightbox(this.src)" style="width:100%; height:115px; object-fit:cover; border-radius:8px; margin-bottom:8px; cursor:zoom-in;" />` : ""}
             <div style="display:flex; justify-content:space-between; gap:6px;">
-              <strong>${p.name}</strong>
-              <span style="font-size:0.74rem; color:var(--text-muted);">${p.createdAt || ""}</span>
+              <strong>${escapeHtml(p.name)}</strong>
+              <span style="font-size:0.74rem; color:var(--text-muted);">${escapeHtml(p.createdAt || "")}</span>
             </div>
-            ${(p.clientName || p.clientPhone) ? `<div style="font-size:0.78rem; color:var(--accent); margin-top:3px;">\u{1F464} ${p.clientName || "Cliente"} ${p.clientPhone ? "\u2022 " + p.clientPhone : ""}</div>` : ""}
+            ${(p.clientName || p.clientPhone) ? `<div style="font-size:0.78rem; color:var(--accent); margin-top:3px;">\u{1F464} ${escapeHtml(p.clientName || "Cliente")} ${p.clientPhone ? "\u2022 " + escapeHtml(p.clientPhone) : ""}</div>` : ""}
             <div style="font-size:0.82rem; margin-top:5px;">
               ${p.batchQty}x \u2022 Unit.: <strong style="color:var(--primary);">${formatBRL(p.unitFinalPrice)}</strong> \u2022 Total: <strong>${formatBRL(p.totalFinalPrice)}</strong>
             </div>
+            ${p.internalNotes ? `<div class="internal-preview-box">\u{1F512} ${escapeHtml(p.internalNotes)}</div>` : ""}
           </div>
           <div style="display:flex; gap:6px;">
             <button class="btn btn-primary btn-sm" style="flex:1;" onclick="loadProject('${p.id}')">\u{1F4C2} Abrir</button>
@@ -1491,7 +1545,7 @@
     }
 
     // =========================================================================
-    // 8. ORCAMENTO WHATSAPP (UNICODE BLINDADO) & IMPRESSAO A4
+    // 8. ORCAMENTO WHATSAPP & IMPRESSAO A4 (EXCLUINDO OBSERVACOES INTERNAS)
     // =========================================================================
     function openQuoteOptionsModal() { document.getElementById("quoteModal").classList.add("open"); }
     function closeQuoteModal() { document.getElementById("quoteModal").classList.remove("open"); }
@@ -1567,12 +1621,15 @@
     function printProposalWindow() {
       saveMachineSettings();
       const q = buildQuoteData();
+      const notesHtml = q.notes
+        ? `<p style="margin-top:20px; font-size:12.5px; color:#475569;"><strong>Observa&ccedil;&otilde;es:</strong> ${escapeHtml(q.notes).replace(/\n/g, "<br/>")}</p>`
+        : "";
       const htmlDoc = `
         <!DOCTYPE html>
         <html lang="pt-BR">
         <head>
           <meta charset="UTF-8" />
-          <title>Or&ccedil;amento - ${q.project}</title>
+          <title>Or&ccedil;amento - ${escapeHtml(q.project)}</title>
           <style>
             body { font-family: Arial, sans-serif; color: #1e293b; padding: 34px; max-width: 760px; margin: 0 auto; }
             .top { display: flex; justify-content: space-between; border-bottom: 2px solid #10b981; padding-bottom: 12px; margin-bottom: 18px; }
@@ -1587,17 +1644,17 @@
         </head>
         <body>
           <div class="top">
-            <div><h1>${q.studio}</h1><div style="font-size:12px; color:#64748b;">Or&ccedil;amento &mdash; Impress&atilde;o 3D</div></div>
-            <div style="text-align:right; font-size:12px;"><strong>Data:</strong> ${new Date().toLocaleDateString("pt-BR")}<br/><strong>Prazo:</strong> ${q.delivery}</div>
+            <div><h1>${escapeHtml(q.studio)}</h1><div style="font-size:12px; color:#64748b;">Or&ccedil;amento &mdash; Impress&atilde;o 3D</div></div>
+            <div style="text-align:right; font-size:12px;"><strong>Data:</strong> ${new Date().toLocaleDateString("pt-BR")}<br/><strong>Prazo:</strong> ${escapeHtml(q.delivery)}</div>
           </div>
-          ${(q.clientName || q.clientPhone) ? `<div class="box"><strong>Cliente:</strong> ${q.clientName || "-"} ${q.clientPhone ? "&bull; " + q.clientPhone : ""}</div>` : ""}
+          ${(q.clientName || q.clientPhone) ? `<div class="box"><strong>Cliente:</strong> ${escapeHtml(q.clientName || "-")} ${q.clientPhone ? "&bull; " + escapeHtml(q.clientPhone) : ""}</div>` : ""}
           ${currentProjectImage ? `<img src="${currentProjectImage}" alt="Produto" />` : ""}
           <table>
             <thead><tr><th>Descri&ccedil;&atilde;o</th><th>Qtd.</th><th>Unit&aacute;rio</th><th>Subtotal</th></tr></thead>
-            <tbody><tr><td>${q.project}</td><td>${q.qty} un.</td><td>${q.unitPrice}</td><td><strong>${q.totalPrice}</strong></td></tr></tbody>
+            <tbody><tr><td>${escapeHtml(q.project)}</td><td>${q.qty} un.</td><td>${q.unitPrice}</td><td><strong>${q.totalPrice}</strong></td></tr></tbody>
           </table>
           <div class="total">Total: ${q.totalPrice}</div>
-          <p style="margin-top:20px; font-size:12.5px; color:#475569;"><strong>Observa&ccedil;&otilde;es:</strong> ${q.notes}</p>
+          ${notesHtml}
           <script>window.onload = function() { window.print(); };<\/script>
         </body>
         </html>
@@ -1621,7 +1678,7 @@
     // 9. BACKUP JSON & BOOTSTRAP
     // =========================================================================
     function exportBackup() {
-      const payload = { version: "4.1-unicode-cloud", exportedAt: new Date().toISOString(), filaments, projects };
+      const payload = { version: "4.2-notes-cloud", exportedAt: new Date().toISOString(), filaments, projects };
       const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
       const a = document.createElement("a");
       a.href = URL.createObjectURL(blob);
