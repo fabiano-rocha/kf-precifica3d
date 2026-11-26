@@ -641,7 +641,7 @@
       <div class="form-grid" style="margin-bottom:12px;">
         <div>
           <label>Nome do Seu Est&uacute;dio</label>
-          <input type="text" id="studioName" value="Impress&atilde;o 3D" />
+          <input type="text" id="studioName" value="Impress&atilde;o 3D" oninput="saveMachineSettings()" />
         </div>
         <div>
           <label>Prazo de Entrega</label>
@@ -755,6 +755,7 @@
     let amsRows = [];
     let currentProjectImage = "";
     let lastCalc = {};
+    let isPushingCloud = false;
 
     function showToast(msg) {
       const el = document.getElementById("toast");
@@ -869,7 +870,8 @@
 
     async function pushAllToCloud(silent = false) {
       const url = getCloudUrl();
-      if (!url) return;
+      if (!url || isPushingCloud) return;
+      isPushingCloud = true;
       updateCloudBadge("\u{23F3} Enviando...", true);
       const settingsObj = {
         printerWatts: parseFloat(document.getElementById("printerWatts").value) || 100,
@@ -894,6 +896,8 @@
       } catch (err) {
         updateCloudBadge("\u{26A0}\u{FE0F} Erro ao Enviar", false);
         if (!silent) showToast("Falha ao enviar para a nuvem.");
+      } finally {
+        isPushingCloud = false;
       }
     }
 
@@ -1678,7 +1682,7 @@
     // 9. BACKUP JSON & BOOTSTRAP
     // =========================================================================
     function exportBackup() {
-      const payload = { version: "4.2-notes-cloud", exportedAt: new Date().toISOString(), filaments, projects };
+      const payload = { version: "4.3-final", exportedAt: new Date().toISOString(), filaments, projects };
       const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
       const a = document.createElement("a");
       a.href = URL.createObjectURL(blob);
