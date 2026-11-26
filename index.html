@@ -323,7 +323,7 @@
         <h1>Precifica3D <span class="badge">Bambu Lab A1 + AMS</span></h1>
       </div>
       <div class="header-actions">
-        <button id="cloudStatusBtn" class="btn btn-accent btn-sm" onclick="openCloudModal()">&#9729;&#65039; Configurar Nuvem</button>
+        <button id="cloudStatusBtn" class="btn btn-primary btn-sm" onclick="openCloudModal()">&#9729;&#65039; Nuvem Conectada</button>
         <button class="btn btn-secondary btn-sm" onclick="syncFromCloud(true)" title="Atualizar da Planilha Google">&#128260;</button>
         <button class="btn btn-secondary btn-sm" onclick="exportBackup()">&#11015;&#65039; Backup</button>
         <label class="btn btn-secondary btn-sm" style="margin:0; cursor:pointer;">
@@ -599,12 +599,12 @@
         <button class="btn btn-secondary btn-sm" onclick="closeCloudModal()">&#10005;</button>
       </div>
       <p style="font-size:0.8rem; color:var(--text-muted); margin-bottom:10px;">
-        Cole abaixo a <strong>URL do App da Web</strong> (terminada em <code>/exec</code>) gerada no Google Apps Script da sua planilha para sincronizar automaticamente entre PC e celular:
+        A URL do Google Apps Script j&aacute; est&aacute; fixa no c&oacute;digo. Caso queira usar outra planilha temporariamente neste navegador, cole abaixo:
       </p>
       <label>URL do Google Apps Script</label>
       <input type="url" id="cloudScriptUrlInput" placeholder="https://script.google.com/macros/s/...../exec" style="margin-bottom:12px;" />
       <div style="display:flex; flex-wrap:wrap; gap:8px; justify-content:space-between;">
-        <button class="btn btn-danger btn-sm" onclick="disconnectCloud()">Desconectar</button>
+        <button class="btn btn-danger btn-sm" onclick="resetToDefaultCloud()">Restaurar URL Padr&atilde;o</button>
         <div style="display:flex; gap:8px;">
           <button class="btn btn-secondary" onclick="pushAllToCloud()">&#11014;&#65039; Enviar Dados Atuais</button>
           <button class="btn btn-primary" onclick="connectAndSyncCloud()">Conectar &amp; Baixar</button>
@@ -677,6 +677,9 @@
     const STORAGE_FILAMENTS_KEY = "precifica3d_filaments_v1";
     const STORAGE_SETTINGS_KEY = "precifica3d_settings_v1";
     const STORAGE_CLOUD_URL_KEY = "precifica3d_cloud_url_v1";
+
+    // URL FIXA DO GOOGLE APPS SCRIPT
+    const DEFAULT_CLOUD_URL = "https://script.google.com/macros/s/AKfycbzViXpy1hk0mIBc1eTJIiWtpv0GpNU5n3Z5b1PM6ywkhG0W26B26Fqq6lCRBKMYAzCz/exec";
 
     const DEFAULT_QUOTE_NOTES = "Pagamento via Pix (50% no pedido e 50% na entrega) ou cart\u00e3o.";
 
@@ -791,7 +794,11 @@
     // 2. NUVEM GOOGLE SHEETS (SYNC GET & POST)
     // =========================================================================
     function getCloudUrl() {
-      try { return localStorage.getItem(STORAGE_CLOUD_URL_KEY) || ""; } catch (e) { return ""; }
+      try {
+        return localStorage.getItem(STORAGE_CLOUD_URL_KEY) || DEFAULT_CLOUD_URL;
+      } catch (e) {
+        return DEFAULT_CLOUD_URL;
+      }
     }
 
     function updateCloudBadge(statusText, isConnected) {
@@ -819,11 +826,11 @@
       await syncFromCloud(true);
     }
 
-    function disconnectCloud() {
+    async function resetToDefaultCloud() {
       localStorage.removeItem(STORAGE_CLOUD_URL_KEY);
-      updateCloudBadge("\u{2601}\u{FE0F} Configurar Nuvem", false);
+      document.getElementById("cloudScriptUrlInput").value = DEFAULT_CLOUD_URL;
       closeCloudModal();
-      showToast("Nuvem desconectada (usando armazenamento local).");
+      await syncFromCloud(true);
     }
 
     async function syncFromCloud(notify = false) {
@@ -1462,7 +1469,7 @@
       document.getElementById("projectCountBadge").textContent = projects.length;
       renderProjects();
       await pushAllToCloud(true);
-      showToast(getCloudUrl() ? "Projeto salvo localmente e na Nuvem!" : "Projeto salvo!");
+      showToast("Projeto salvo localmente e na Nuvem!");
     }
 
     function loadProject(id) {
@@ -1682,7 +1689,7 @@
     // 9. BACKUP JSON & BOOTSTRAP
     // =========================================================================
     function exportBackup() {
-      const payload = { version: "4.3-final", exportedAt: new Date().toISOString(), filaments, projects };
+      const payload = { version: "4.4-fixed-cloud", exportedAt: new Date().toISOString(), filaments, projects };
       const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
       const a = document.createElement("a");
       a.href = URL.createObjectURL(blob);
