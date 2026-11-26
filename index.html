@@ -34,22 +34,6 @@
 
     .container { max-width: 1160px; margin: 0 auto; padding: 14px; }
 
-    .sandbox-banner {
-      display: none;
-      background: rgba(245, 158, 11, 0.15);
-      border: 1px solid var(--warn);
-      color: #fde68a;
-      padding: 9px 14px;
-      border-radius: 10px;
-      font-size: 12.5px;
-      margin-bottom: 12px;
-      align-items: center;
-      justify-content: space-between;
-      gap: 10px;
-      flex-wrap: wrap;
-    }
-    .sandbox-banner.show { display: flex; }
-
     header {
       background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
       border: 1px solid var(--border);
@@ -72,15 +56,14 @@
       border-radius: 999px;
       font-weight: 600;
     }
-    .header-actions { display: flex; gap: 8px; flex-wrap: wrap; }
-
-    /* Abas */
-    .tabs {
-      display: flex;
-      gap: 8px;
-      margin-bottom: 16px;
-      flex-wrap: wrap;
+    .badge.warn {
+      background: rgba(245, 158, 11, 0.18);
+      color: #fbbf24;
+      border-color: rgba(245, 158, 11, 0.4);
     }
+    .header-actions { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+
+    .tabs { display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; }
     .tab-btn {
       background: var(--bg-card);
       color: var(--text-muted);
@@ -97,7 +80,6 @@
     .tab-panel { display: none; }
     .tab-panel.active { display: block; }
 
-    /* Grid */
     .grid-main {
       display: grid;
       grid-template-columns: 1.3fr 0.95fr;
@@ -144,7 +126,6 @@
     }
     input:focus, select:focus, textarea:focus { border-color: var(--primary); }
 
-    /* Botões */
     .btn {
       display: inline-flex;
       align-items: center;
@@ -168,7 +149,6 @@
     .btn-danger { background: rgba(239, 68, 68, 0.16); color: #fca5a5; border-color: rgba(239, 68, 68, 0.4); }
     .btn-sm { padding: 5px 9px; font-size: 0.77rem; }
 
-    /* Barra compacta de importação */
     .quick-bar {
       display: flex;
       gap: 8px;
@@ -184,7 +164,6 @@
     }
     .quick-bar.dragover { border-color: var(--primary); background: rgba(16, 185, 129, 0.08); }
 
-    /* Preview compacto de foto */
     .img-chip {
       display: none;
       align-items: center;
@@ -198,7 +177,6 @@
     .img-chip.show { display: flex; }
     .img-chip img { width: 46px; height: 46px; object-fit: cover; border-radius: 6px; cursor: zoom-in; }
 
-    /* Linhas AMS */
     .ams-row {
       display: grid;
       grid-template-columns: 1.7fr 0.75fr auto;
@@ -208,7 +186,6 @@
     }
     @media (max-width: 500px) { .ams-row { grid-template-columns: 1fr 86px auto; } }
 
-    /* Acordeão de ajustes fixos */
     details.settings-box {
       background: var(--bg-card);
       border: 1px solid var(--border);
@@ -229,7 +206,6 @@
     details.settings-box summary::-webkit-details-marker { display: none; }
     details.settings-box[open] summary { color: var(--text); margin-bottom: 12px; border-bottom: 1px solid var(--border); padding-bottom: 8px; }
 
-    /* Painel Resultado */
     .sticky-panel { position: sticky; top: 12px; }
     .kpi-hero {
       background: linear-gradient(135deg, rgba(16, 185, 129, 0.18), rgba(56, 189, 248, 0.12));
@@ -255,7 +231,6 @@
     th, td { padding: 7px 6px; text-align: left; border-bottom: 1px solid var(--border); }
     th { color: var(--text-muted); font-weight: 600; }
 
-    /* Cards Catálogo e Projetos */
     .cards-grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(255px, 1fr));
@@ -281,7 +256,6 @@
       margin-right: 6px;
     }
 
-    /* Modais */
     .modal-backdrop {
       display: none;
       position: fixed;
@@ -326,17 +300,14 @@
 </head>
 <body>
   <div class="container">
-    <div id="sandboxBanner" class="sandbox-banner">
-      <span>⚠️ <strong>Modo Isolado (Google Sites):</strong> Salve seus dados clicando em <strong>Exportar Backup</strong>.</span>
-      <button class="btn btn-warn btn-sm" onclick="exportBackup()">⬇️ Exportar Backup</button>
-    </div>
-
     <header>
       <div class="brand">
         <h1>Precifica3D <span class="badge">Bambu Lab A1 + AMS</span></h1>
       </div>
       <div class="header-actions">
-        <button class="btn btn-secondary btn-sm" onclick="exportBackup()">⬇️ Backup (.json)</button>
+        <button id="cloudStatusBtn" class="btn btn-accent btn-sm" onclick="openCloudModal()">☁️ Configurar Nuvem</button>
+        <button class="btn btn-secondary btn-sm" onclick="syncFromCloud(true)" title="Atualizar da Planilha Google">🔄</button>
+        <button class="btn btn-secondary btn-sm" onclick="exportBackup()">⬇️ Backup</button>
         <label class="btn btn-secondary btn-sm" style="margin:0; cursor:pointer;">
           ⬆️ Restaurar
           <input type="file" accept=".json" style="display:none;" onchange="importBackup(event)" />
@@ -350,11 +321,10 @@
       <button class="tab-btn" data-tab="projects" onclick="switchTab('projects')">📁 Projetos (<span id="projectCountBadge">0</span>)</button>
     </nav>
 
-    <!-- ABA 1: CALCULADORA DIRETA -->
+    <!-- ABA 1: CALCULADORA -->
     <section id="tab-calc" class="tab-panel active">
       <div class="grid-main">
         <div>
-          <!-- Importação rápida -->
           <div id="3mfDropzone" class="quick-bar">
             <span style="flex:1;">⚡ <strong>Bambu Studio:</strong> arraste um <code>.gcode.3mf</code> ou importe:</span>
             <button class="btn btn-secondary btn-sm" onclick="document.getElementById('3mfFileInput').click()">📂 Arquivo .3mf</button>
@@ -362,13 +332,16 @@
             <input type="file" id="3mfFileInput" accept=".3mf" style="display:none;" onchange="handle3mfFile(event.target.files[0])" />
           </div>
 
-          <!-- Projeto, Cliente e Foto compacta -->
           <div class="card">
             <div class="card-title">
               <span>📦 Projeto & Cliente</span>
-              <button class="btn btn-secondary btn-sm" onclick="document.getElementById('imgFileInput').click()">📷 Anexar Foto (ou Ctrl+V)</button>
+              <div style="display:flex; gap:6px;">
+                <button class="btn btn-secondary btn-sm" onclick="resetCalculatorForm()">🆕 Novo</button>
+                <button class="btn btn-secondary btn-sm" onclick="document.getElementById('imgFileInput').click()">📷 Anexar Foto (ou Ctrl+V)</button>
+              </div>
               <input type="file" id="imgFileInput" accept="image/*" style="display:none;" onchange="handleImageFile(event.target.files[0])" />
             </div>
+            <input type="hidden" id="editingProjectId" />
             <div class="form-grid">
               <div class="full">
                 <label>Nome da Peça / Projeto</label>
@@ -385,12 +358,11 @@
             </div>
             <div id="imgChip" class="img-chip">
               <img id="imgPreview" src="" alt="Preview" onclick="openLightbox(this.src)" />
-              <span style="flex:1; font-size:0.78rem; color:var(--text-muted);">Foto anexada (clique para ampliar)</span>
+              <span style="flex:1; font-size:0.78rem; color:var(--text-muted);">Foto otimizada para sincronização na nuvem</span>
               <button class="btn btn-danger btn-sm" onclick="removeProjectImage()">✕</button>
             </div>
           </div>
 
-          <!-- Filamentos AMS (Total por cor = Peça + Purga + Torre) -->
           <div class="card">
             <div class="card-title">
               <span>🎨 Filamentos Usados por Cor (Peça + Purga/Torre em g)</span>
@@ -400,7 +372,7 @@
             <div class="form-grid" style="margin-top:10px;">
               <div>
                 <label>Margem Extra de Perda/Purga (%)</label>
-                <input type="number" id="extraWastePct" value="0" min="0" step="5" title="Use apenas se não tiver o peso fatiado com purga" oninput="calculate()" />
+                <input type="number" id="extraWastePct" value="0" min="0" step="5" oninput="calculate()" />
               </div>
               <div>
                 <label>Peças na Mesa (Lote)</label>
@@ -409,7 +381,6 @@
             </div>
           </div>
 
-          <!-- Tempo, Acabamento, Margem e Canal -->
           <div class="card">
             <div class="card-title"><span>⏱️ Tempo, Acabamento & Venda</span></div>
             <div class="form-grid-3">
@@ -445,7 +416,6 @@
             </div>
           </div>
 
-          <!-- Ajustes Fixos Recolhidos -->
           <details class="settings-box">
             <summary>
               <span>⚙️ Ajustes Fixos da Bambu A1 & Energia MT</span>
@@ -472,7 +442,6 @@
           </details>
         </div>
 
-        <!-- COLUNA DIREITA: RESULTADO + AÇÕES COMERCIAIS -->
         <div class="sticky-panel">
           <div class="card">
             <div class="card-title"><span>💰 Resumo & Orçamento</span></div>
@@ -589,6 +558,28 @@
     </section>
   </div>
 
+  <!-- Modal Configuração Nuvem Google Sheets -->
+  <div id="cloudModal" class="modal-backdrop">
+    <div class="modal-box">
+      <div class="card-title">
+        <span>☁️ Sincronização na Nuvem (Google Sheets)</span>
+        <button class="btn btn-secondary btn-sm" onclick="closeCloudModal()">✕</button>
+      </div>
+      <p style="font-size:0.8rem; color:var(--text-muted); margin-bottom:10px;">
+        Cole abaixo a <strong>URL do App da Web</strong> (terminada em <code>/exec</code>) gerada no Google Apps Script da sua planilha para sincronizar automaticamente entre PC e celular:
+      </p>
+      <label>URL do Google Apps Script</label>
+      <input type="url" id="cloudScriptUrlInput" placeholder="https://script.google.com/macros/s/...../exec" style="margin-bottom:12px;" />
+      <div style="display:flex; flex-wrap:wrap; gap:8px; justify-content:space-between;">
+        <button class="btn btn-danger btn-sm" onclick="disconnectCloud()">Desconectar</button>
+        <div style="display:flex; gap:8px;">
+          <button class="btn btn-secondary" onclick="pushAllToCloud()">⬆️ Enviar Dados Atuais</button>
+          <button class="btn btn-primary" onclick="connectAndSyncCloud()">Conectar & Baixar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- Modal Colar Resumo Bambu Studio -->
   <div id="pasteModal" class="modal-backdrop">
     <div class="modal-box">
@@ -645,48 +636,78 @@
 
   <script>
     // =========================================================================
-    // 1. ARMAZENAMENTO SEGURO (BLINDADO CONTRA SANDBOX GOOGLE SITES)
+    // 1. BANCO INDEXEDDB LOCAL + SINCRONIZAÇÃO NUVEM (GOOGLE APPS SCRIPT)
     // =========================================================================
-    const SafeStorage = (() => {
-      let memoryStore = {};
-      let isSandboxed = false;
-      try {
-        const k = "__p3d_test__";
-        window.localStorage.setItem(k, "1");
-        window.localStorage.removeItem(k);
-      } catch (e) {
-        isSandboxed = true;
-      }
-      if (isSandboxed) {
-        document.addEventListener("DOMContentLoaded", () => {
-          document.getElementById("sandboxBanner")?.classList.add("show");
-        });
-      }
-      return {
-        getItem(key) {
-          if (!isSandboxed) {
-            try { return window.localStorage.getItem(key); } catch (e) {}
-          }
-          return Object.prototype.hasOwnProperty.call(memoryStore, key) ? memoryStore[key] : null;
-        },
-        setItem(key, val) {
-          memoryStore[key] = val;
-          if (!isSandboxed) {
-            try {
-              window.localStorage.setItem(key, val);
-              return { ok: true };
-            } catch (e) {
-              return { ok: false, error: e };
-            }
-          }
-          return { ok: true, sandboxed: true };
-        }
-      };
-    })();
+    const DB_NAME = "Precifica3D_DB";
+    const DB_VERSION = 1;
+    const STORE_PROJECTS = "projects";
 
     const STORAGE_FILAMENTS_KEY = "precifica3d_filaments_v1";
-    const STORAGE_PROJECTS_KEY = "precifica3d_projects_v2";
     const STORAGE_SETTINGS_KEY = "precifica3d_settings_v1";
+    const STORAGE_CLOUD_URL_KEY = "precifica3d_cloud_url_v1";
+
+    const ProjectDB = (() => {
+      let dbPromise = null;
+      function open() {
+        if (dbPromise) return dbPromise;
+        dbPromise = new Promise((resolve, reject) => {
+          if (!window.indexedDB) { reject(new Error("IndexedDB indisponível")); return; }
+          const req = window.indexedDB.open(DB_NAME, DB_VERSION);
+          req.onupgradeneeded = (e) => {
+            const db = e.target.result;
+            if (!db.objectStoreNames.contains(STORE_PROJECTS)) {
+              db.createObjectStore(STORE_PROJECTS, { keyPath: "id" });
+            }
+          };
+          req.onsuccess = () => resolve(req.result);
+          req.onerror = () => reject(req.error);
+        });
+        return dbPromise;
+      }
+      async function getAll() {
+        const db = await open();
+        return new Promise((resolve, reject) => {
+          const tx = db.transaction(STORE_PROJECTS, "readonly");
+          const req = tx.objectStore(STORE_PROJECTS).getAll();
+          req.onsuccess = () => {
+            const items = req.result || [];
+            items.sort((a, b) => (b.updatedAt || 0) - (a.updatedAt || 0));
+            resolve(items);
+          };
+          req.onerror = () => reject(req.error);
+        });
+      }
+      async function put(project) {
+        const db = await open();
+        return new Promise((resolve, reject) => {
+          const tx = db.transaction(STORE_PROJECTS, "readwrite");
+          tx.objectStore(STORE_PROJECTS).put(project);
+          tx.oncomplete = () => resolve(true);
+          tx.onerror = () => reject(tx.error);
+        });
+      }
+      async function remove(id) {
+        const db = await open();
+        return new Promise((resolve, reject) => {
+          const tx = db.transaction(STORE_PROJECTS, "readwrite");
+          tx.objectStore(STORE_PROJECTS).delete(id);
+          tx.oncomplete = () => resolve(true);
+          tx.onerror = () => reject(tx.error);
+        });
+      }
+      async function clearAndBulkPut(list) {
+        const db = await open();
+        return new Promise((resolve, reject) => {
+          const tx = db.transaction(STORE_PROJECTS, "readwrite");
+          const store = tx.objectStore(STORE_PROJECTS);
+          store.clear();
+          list.forEach(item => store.put(item));
+          tx.oncomplete = () => resolve(true);
+          tx.onerror = () => reject(tx.error);
+        });
+      }
+      return { open, getAll, put, remove, clearAndBulkPut };
+    })();
 
     const DEFAULT_FILAMENTS = [
       { id: "fil_1", name: "Branco Neve", material: "PLA", color: "#f8fafc", rollWeight: 1000, rollPrice: 109.90, stockGrams: 1000 },
@@ -706,7 +727,7 @@
       el.textContent = msg;
       el.classList.add("show");
       clearTimeout(el._t);
-      el._t = setTimeout(() => el.classList.remove("show"), 3000);
+      el._t = setTimeout(() => el.classList.remove("show"), 3200);
     }
 
     function formatBRL(val) {
@@ -724,45 +745,165 @@
     }
 
     // =========================================================================
-    // 2. ESTADO INICIAL & AJUSTES FIXOS
+    // 2. NUVEM GOOGLE SHEETS (SYNC GET & POST)
     // =========================================================================
-    function loadState() {
-      try {
-        const rawFil = SafeStorage.getItem(STORAGE_FILAMENTS_KEY);
-        filaments = rawFil ? JSON.parse(rawFil) : [...DEFAULT_FILAMENTS];
-        if (!Array.isArray(filaments) || !filaments.length) filaments = [...DEFAULT_FILAMENTS];
-      } catch (e) { filaments = [...DEFAULT_FILAMENTS]; }
-
-      try {
-        const rawProj = SafeStorage.getItem(STORAGE_PROJECTS_KEY);
-        projects = rawProj ? JSON.parse(rawProj) : [];
-        if (!Array.isArray(projects)) projects = [];
-      } catch (e) { projects = []; }
-
-      try {
-        const rawSet = SafeStorage.getItem(STORAGE_SETTINGS_KEY);
-        if (rawSet) {
-          const s = JSON.parse(rawSet);
-          if (s.printerWatts) document.getElementById("printerWatts").value = s.printerWatts;
-          if (s.kwhPrice) document.getElementById("kwhPrice").value = s.kwhPrice;
-          if (s.maintenanceRate) document.getElementById("maintenanceRate").value = s.maintenanceRate;
-          if (s.laborHourRate) document.getElementById("laborHourRate").value = s.laborHourRate;
-          if (s.studioName) document.getElementById("studioName").value = s.studioName;
-        }
-      } catch (e) {}
-      updateFixedSummaryLabel();
+    function getCloudUrl() {
+      try { return localStorage.getItem(STORAGE_CLOUD_URL_KEY) || ""; } catch (e) { return ""; }
     }
 
-    function saveMachineSettings() {
-      const data = {
+    function updateCloudBadge(statusText, isConnected) {
+      const btn = document.getElementById("cloudStatusBtn");
+      btn.textContent = statusText;
+      btn.className = isConnected ? "btn btn-primary btn-sm" : "btn btn-accent btn-sm";
+    }
+
+    function openCloudModal() {
+      document.getElementById("cloudScriptUrlInput").value = getCloudUrl();
+      document.getElementById("cloudModal").classList.add("open");
+    }
+    function closeCloudModal() {
+      document.getElementById("cloudModal").classList.remove("open");
+    }
+
+    async function connectAndSyncCloud() {
+      const url = document.getElementById("cloudScriptUrlInput").value.trim();
+      if (!url || !url.startsWith("http")) {
+        showToast("Cole uma URL válida terminada em /exec.");
+        return;
+      }
+      localStorage.setItem(STORAGE_CLOUD_URL_KEY, url);
+      closeCloudModal();
+      await syncFromCloud(true);
+    }
+
+    function disconnectCloud() {
+      localStorage.removeItem(STORAGE_CLOUD_URL_KEY);
+      updateCloudBadge("☁️ Configurar Nuvem", false);
+      closeCloudModal();
+      showToast("Nuvem desconectada (usando armazenamento local).");
+    }
+
+    async function syncFromCloud(notify = false) {
+      const url = getCloudUrl();
+      if (!url) {
+        updateCloudBadge("☁️ Configurar Nuvem", false);
+        return;
+      }
+      updateCloudBadge("⏳ Sincronizando...", true);
+      try {
+        const resp = await fetch(url, { method: "GET" });
+        const data = await resp.json();
+        if (data && data.ok) {
+          if (Array.isArray(data.filaments) && data.filaments.length > 0) {
+            filaments = data.filaments;
+            localStorage.setItem(STORAGE_FILAMENTS_KEY, JSON.stringify(filaments));
+          }
+          if (Array.isArray(data.projects)) {
+            projects = data.projects;
+            projects.sort((a, b) => (b.updatedAt || 0) - (a.updatedAt || 0));
+            try { await ProjectDB.clearAndBulkPut(projects); } catch (e) {}
+          }
+          if (data.settings) {
+            applySettingsObject(data.settings);
+            localStorage.setItem(STORAGE_SETTINGS_KEY, JSON.stringify(data.settings));
+          }
+          document.getElementById("filamentCountBadge").textContent = filaments.length;
+          document.getElementById("projectCountBadge").textContent = projects.length;
+          renderFilaments();
+          renderProjects();
+          renderAmsRows();
+          calculate();
+          updateCloudBadge("☁️ Nuvem Sincronizada", true);
+          if (notify) showToast("Dados sincronizados com a Planilha Google!");
+        } else {
+          updateCloudBadge("⚠️ Erro na Nuvem", false);
+          if (notify) showToast("Resposta inválida da planilha.");
+        }
+      } catch (err) {
+        updateCloudBadge("⚠️ Nuvem Offline", false);
+        if (notify) showToast("Não foi possível conectar à Planilha Google.");
+      }
+    }
+
+    async function pushAllToCloud(silent = false) {
+      const url = getCloudUrl();
+      if (!url) return;
+      updateCloudBadge("⏳ Enviando...", true);
+      const settingsObj = {
         printerWatts: parseFloat(document.getElementById("printerWatts").value) || 100,
         kwhPrice: parseFloat(document.getElementById("kwhPrice").value) || 1.19,
         maintenanceRate: parseFloat(document.getElementById("maintenanceRate").value) || 0.80,
         laborHourRate: parseFloat(document.getElementById("laborHourRate").value) || 25,
         studioName: document.getElementById("studioName").value || "Impressão 3D"
       };
-      SafeStorage.setItem(STORAGE_SETTINGS_KEY, JSON.stringify(data));
+      try {
+        await fetch(url, {
+          method: "POST",
+          mode: "no-cors",
+          headers: { "Content-Type": "text/plain;charset=utf-8" },
+          body: JSON.stringify({
+            filaments,
+            projects,
+            settings: settingsObj
+          })
+        });
+        updateCloudBadge("☁️ Nuvem Sincronizada", true);
+        if (!silent) showToast("Dados enviados para a Planilha Google!");
+      } catch (err) {
+        updateCloudBadge("⚠️ Erro ao Enviar", false);
+        if (!silent) showToast("Falha ao enviar para a nuvem.");
+      }
+    }
+
+    // =========================================================================
+    // 3. CARREGAMENTO INICIAL
+    // =========================================================================
+    function applySettingsObject(s) {
+      if (!s) return;
+      if (s.printerWatts) document.getElementById("printerWatts").value = s.printerWatts;
+      if (s.kwhPrice) document.getElementById("kwhPrice").value = s.kwhPrice;
+      if (s.maintenanceRate) document.getElementById("maintenanceRate").value = s.maintenanceRate;
+      if (s.laborHourRate) document.getElementById("laborHourRate").value = s.laborHourRate;
+      if (s.studioName) document.getElementById("studioName").value = s.studioName;
       updateFixedSummaryLabel();
+    }
+
+    async function loadLocalState() {
+      try {
+        const rawFil = localStorage.getItem(STORAGE_FILAMENTS_KEY);
+        filaments = rawFil ? JSON.parse(rawFil) : [...DEFAULT_FILAMENTS];
+        if (!Array.isArray(filaments) || !filaments.length) filaments = [...DEFAULT_FILAMENTS];
+      } catch (e) { filaments = [...DEFAULT_FILAMENTS]; }
+
+      try {
+        const rawSet = localStorage.getItem(STORAGE_SETTINGS_KEY);
+        if (rawSet) applySettingsObject(JSON.parse(rawSet));
+      } catch (e) {}
+      updateFixedSummaryLabel();
+
+      try {
+        projects = await ProjectDB.getAll();
+      } catch (err) {
+        projects = [];
+      }
+
+      document.getElementById("filamentCountBadge").textContent = filaments.length;
+      document.getElementById("projectCountBadge").textContent = projects.length;
+    }
+
+    function saveMachineSettings() {
+      try {
+        const data = {
+          printerWatts: parseFloat(document.getElementById("printerWatts").value) || 100,
+          kwhPrice: parseFloat(document.getElementById("kwhPrice").value) || 1.19,
+          maintenanceRate: parseFloat(document.getElementById("maintenanceRate").value) || 0.80,
+          laborHourRate: parseFloat(document.getElementById("laborHourRate").value) || 25,
+          studioName: document.getElementById("studioName").value || "Impressão 3D"
+        };
+        localStorage.setItem(STORAGE_SETTINGS_KEY, JSON.stringify(data));
+      } catch (e) {}
+      updateFixedSummaryLabel();
+      pushAllToCloud(true);
     }
 
     function updateFixedSummaryLabel() {
@@ -773,14 +914,9 @@
     }
 
     function persistFilaments() {
-      SafeStorage.setItem(STORAGE_FILAMENTS_KEY, JSON.stringify(filaments));
+      try { localStorage.setItem(STORAGE_FILAMENTS_KEY, JSON.stringify(filaments)); } catch (e) {}
       document.getElementById("filamentCountBadge").textContent = filaments.length;
-    }
-
-    function persistProjects() {
-      const res = SafeStorage.setItem(STORAGE_PROJECTS_KEY, JSON.stringify(projects));
-      document.getElementById("projectCountBadge").textContent = projects.length;
-      return res;
+      pushAllToCloud(true);
     }
 
     function switchTab(tab) {
@@ -791,7 +927,7 @@
     }
 
     // =========================================================================
-    // 3. LINHAS DE FILAMENTO (PESO REAL POR COR = PEÇA + PURGA + TORRE)
+    // 4. LINHAS AMS & CÁLCULOS
     // =========================================================================
     function ensureFilamentExists(filId, fallbackName = "Filamento Restaurado", fallbackCostPerGram = 0.11) {
       let found = filaments.find(f => f.id === filId);
@@ -822,10 +958,7 @@
     }
 
     function removeAmsRow(uid) {
-      if (amsRows.length <= 1) {
-        showToast("Mantenha pelo menos 1 filamento.");
-        return;
-      }
+      if (amsRows.length <= 1) { showToast("Mantenha pelo menos 1 filamento."); return; }
       amsRows = amsRows.filter(r => r.uid !== uid);
       renderAmsRows();
       calculate();
@@ -869,9 +1002,6 @@
       });
     }
 
-    // =========================================================================
-    // 4. CÁLCULO FINANCEIRO E ESCALA DE LOTE
-    // =========================================================================
     function getCostPerGram(filamentId) {
       const f = filaments.find(x => x.id === filamentId) || filaments[0];
       return (f && f.rollWeight > 0) ? (f.rollPrice / f.rollWeight) : 0;
@@ -882,7 +1012,6 @@
       const currentBatch = Math.max(1, parseInt(document.getElementById("batchQty").value, 10) || 1);
       const wasteFactor = 1 + (Math.max(0, parseFloat(document.getElementById("extraWastePct").value) || 0) / 100);
 
-      // Gramas informadas nas linhas referem-se à mesa atual (currentBatch)
       let tableGrams = 0;
       let tableFilCost = 0;
       amsRows.forEach(r => {
@@ -898,7 +1027,7 @@
 
       const baseHours = (parseFloat(document.getElementById("printHours").value) || 0) +
                         ((parseFloat(document.getElementById("printMinutes").value) || 0) / 60);
-      const setupHours = Math.min(baseHours * 0.15, 0.15); // ~9 min nivelamento fixo
+      const setupHours = Math.min(baseHours * 0.15, 0.15);
       const varHoursPerUnit = Math.max(0, (baseHours - setupHours) / currentBatch);
       const scaledHours = batchQty === currentBatch ? baseHours : (setupHours + varHoursPerUnit * batchQty);
 
@@ -979,9 +1108,9 @@
     }
 
     // =========================================================================
-    // 5. FOTO COMPACTA & IMPORTAÇÃO BAMBU STUDIO (.3MF / TEXTO)
+    // 5. COMPRESSÃO DE IMAGEM PARA GOOGLE SHEETS (<= 360PX, ~15-22 KB)
     // =========================================================================
-    function compressImageDataUrl(dataUrl, maxDim = 480, quality = 0.68) {
+    function compressImageDataUrl(dataUrl, maxDim = 360, quality = 0.65) {
       return new Promise((resolve, reject) => {
         const img = new Image();
         img.onload = () => {
@@ -1048,10 +1177,7 @@
 
     async function handle3mfFile(file) {
       if (!file) return;
-      if (typeof JSZip === "undefined") {
-        showToast("Use 'Colar Resumo' no modo offline.");
-        return;
-      }
+      if (typeof JSZip === "undefined") { showToast("Use 'Colar Resumo' no modo offline."); return; }
       try {
         const zip = await JSZip.loadAsync(file);
         const sliceFile = zip.file("Metadata/slice_info.config");
@@ -1090,9 +1216,7 @@
         }
         calculate();
         showToast("Arquivo .3mf importado!");
-      } catch (e) {
-        showToast("Não foi possível ler o .3mf.");
-      }
+      } catch (e) { showToast("Não foi possível ler o .3mf."); }
     }
 
     function openPasteModal() { document.getElementById("pasteModal").classList.add("open"); }
@@ -1219,11 +1343,36 @@
     }
 
     // =========================================================================
-    // 7. PROJETOS SALVOS
+    // 7. PROJETOS SALVOS (LOCAL + NUVEM)
     // =========================================================================
-    function saveCurrentProject() {
+    function resetCalculatorForm() {
+      document.getElementById("editingProjectId").value = "";
+      document.getElementById("projectName").value = "";
+      document.getElementById("clientName").value = "";
+      document.getElementById("clientPhone").value = "";
+      setProjectImage("");
+      amsRows = [];
+      addAmsRow(filaments[0].id, 25);
+      document.getElementById("extraWastePct").value = 0;
+      document.getElementById("batchQty").value = 1;
+      document.getElementById("printHours").value = 2;
+      document.getElementById("printMinutes").value = 0;
+      document.getElementById("laborMinutes").value = 5;
+      document.getElementById("extraCost").value = "0.00";
+      document.getElementById("profitMargin").value = 100;
+      document.getElementById("salesChannel").value = "0";
+      calculate();
+      showToast("Formulário limpo para novo projeto.");
+    }
+
+    async function saveCurrentProject() {
+      const existingId = document.getElementById("editingProjectId").value;
+      const projId = existingId || ("proj_" + Date.now());
+      const now = Date.now();
+
       const snapshot = {
-        id: "proj_" + Date.now(),
+        id: projId,
+        updatedAt: now,
         createdAt: new Date().toLocaleDateString("pt-BR"),
         name: document.getElementById("projectName").value.trim() || "Peça 3D",
         clientName: document.getElementById("clientName").value.trim(),
@@ -1250,22 +1399,27 @@
         totalFinalPrice: lastCalc.totalFinalPrice || 0
       };
 
-      projects.unshift(snapshot);
-      let res = persistProjects();
-      if (!res.ok) {
-        projects[0].image = "";
-        res = persistProjects();
-        if (res.ok) showToast("Memória cheia: projeto salvo sem a foto.");
-        else { projects.shift(); showToast("Sem espaço no navegador. Exporte backup."); return; }
-      } else {
-        showToast("Projeto salvo!");
+      try {
+        await ProjectDB.put(snapshot);
+        projects = await ProjectDB.getAll();
+      } catch (err) {
+        const idx = projects.findIndex(p => p.id === projId);
+        if (idx !== -1) projects[idx] = snapshot;
+        else projects.unshift(snapshot);
       }
+
+      document.getElementById("editingProjectId").value = projId;
+      document.getElementById("projectCountBadge").textContent = projects.length;
       renderProjects();
+      await pushAllToCloud(true);
+      showToast(getCloudUrl() ? "Projeto salvo localmente e na Nuvem!" : "Projeto salvo!");
     }
 
     function loadProject(id) {
       const p = projects.find(x => x.id === id);
       if (!p) return;
+
+      document.getElementById("editingProjectId").value = p.id;
       document.getElementById("projectName").value = p.name || "";
       document.getElementById("clientName").value = p.clientName || "";
       document.getElementById("clientPhone").value = p.clientPhone || "";
@@ -1292,10 +1446,19 @@
       showToast("Projeto carregado!");
     }
 
-    function deleteProject(id) {
-      projects = projects.filter(p => p.id !== id);
-      persistProjects();
+    async function deleteProject(id) {
+      try {
+        await ProjectDB.remove(id);
+        projects = await ProjectDB.getAll();
+      } catch (e) {
+        projects = projects.filter(p => p.id !== id);
+      }
+      if (document.getElementById("editingProjectId").value === id) {
+        document.getElementById("editingProjectId").value = "";
+      }
+      document.getElementById("projectCountBadge").textContent = projects.length;
       renderProjects();
+      await pushAllToCloud(true);
       showToast("Projeto excluído.");
     }
 
@@ -1316,7 +1479,7 @@
             ${p.image ? `<img src="${p.image}" onclick="openLightbox(this.src)" style="width:100%; height:115px; object-fit:cover; border-radius:8px; margin-bottom:8px; cursor:zoom-in;" />` : ""}
             <div style="display:flex; justify-content:space-between; gap:6px;">
               <strong>${p.name}</strong>
-              <span style="font-size:0.74rem; color:var(--text-muted);">${p.createdAt}</span>
+              <span style="font-size:0.74rem; color:var(--text-muted);">${p.createdAt || ""}</span>
             </div>
             ${(p.clientName || p.clientPhone) ? `<div style="font-size:0.78rem; color:var(--accent); margin-top:3px;">👤 ${p.clientName || "Cliente"} ${p.clientPhone ? "• " + p.clientPhone : ""}</div>` : ""}
             <div style="font-size:0.82rem; margin-top:5px;">
@@ -1436,10 +1599,10 @@
     }
 
     // =========================================================================
-    // 9. BACKUP JSON & INICIALIZAÇÃO
+    // 9. BACKUP JSON & BOOTSTRAP
     // =========================================================================
     function exportBackup() {
-      const payload = { version: "3.0-compact", exportedAt: new Date().toISOString(), filaments, projects };
+      const payload = { version: "4.0-cloud", exportedAt: new Date().toISOString(), filaments, projects };
       const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
       const a = document.createElement("a");
       a.href = URL.createObjectURL(blob);
@@ -1452,29 +1615,39 @@
       const file = event.target.files[0];
       if (!file) return;
       const reader = new FileReader();
-      reader.onload = (e) => {
+      reader.onload = async (e) => {
         try {
           const data = JSON.parse(e.target.result);
-          if (Array.isArray(data.filaments) && data.filaments.length) { filaments = data.filaments; persistFilaments(); }
-          if (Array.isArray(data.projects)) { projects = data.projects; persistProjects(); }
+          if (Array.isArray(data.filaments) && data.filaments.length) {
+            filaments = data.filaments;
+            persistFilaments();
+          }
+          if (Array.isArray(data.projects)) {
+            projects = data.projects;
+            try { await ProjectDB.clearAndBulkPut(projects); } catch (err) {}
+            document.getElementById("projectCountBadge").textContent = projects.length;
+            await pushAllToCloud(true);
+          }
           renderFilaments();
           renderProjects();
           renderAmsRows();
           calculate();
           showToast("Backup restaurado!");
-        } catch (err) { showToast("Backup inválido."); }
+        } catch (err) { showToast("Arquivo inválido."); }
       };
       reader.readAsText(file);
     }
 
-    document.addEventListener("DOMContentLoaded", () => {
-      loadState();
-      persistFilaments();
-      persistProjects();
+    document.addEventListener("DOMContentLoaded", async () => {
+      await loadLocalState();
       addAmsRow(filaments[0].id, 30);
       renderFilaments();
       renderProjects();
       calculate();
+
+      if (getCloudUrl()) {
+        await syncFromCloud(false);
+      }
 
       const dz = document.getElementById("3mfDropzone");
       ["dragenter", "dragover"].forEach(ev => dz.addEventListener(ev, e => { e.preventDefault(); dz.classList.add("dragover"); }));
