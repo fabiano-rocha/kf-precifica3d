@@ -1,0 +1,1486 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Precifica3D — Bambu Lab A1 + AMS</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js" defer></script>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --bg-card: #1e293b;
+      --bg-input: #0b1220;
+      --bg-soft: #263449;
+      --border: #334155;
+      --text: #f1f5f9;
+      --text-muted: #94a3b8;
+      --primary: #10b981;
+      --primary-hover: #059669;
+      --accent: #38bdf8;
+      --warn: #f59e0b;
+      --danger: #ef4444;
+      --radius: 12px;
+      --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.4);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Inter, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.45;
+      padding-bottom: 28px;
+    }
+
+    .container { max-width: 1160px; margin: 0 auto; padding: 14px; }
+
+    .sandbox-banner {
+      display: none;
+      background: rgba(245, 158, 11, 0.15);
+      border: 1px solid var(--warn);
+      color: #fde68a;
+      padding: 9px 14px;
+      border-radius: 10px;
+      font-size: 12.5px;
+      margin-bottom: 12px;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .sandbox-banner.show { display: flex; }
+
+    header {
+      background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 14px 18px;
+      margin-bottom: 14px;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+    .brand h1 { font-size: 1.2rem; font-weight: 700; display: flex; align-items: center; gap: 8px; }
+    .badge {
+      background: rgba(16, 185, 129, 0.18);
+      color: var(--primary);
+      border: 1px solid rgba(16, 185, 129, 0.4);
+      font-size: 0.72rem;
+      padding: 2px 8px;
+      border-radius: 999px;
+      font-weight: 600;
+    }
+    .header-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+
+    /* Abas */
+    .tabs {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 16px;
+      flex-wrap: wrap;
+    }
+    .tab-btn {
+      background: var(--bg-card);
+      color: var(--text-muted);
+      border: 1px solid var(--border);
+      padding: 8px 15px;
+      border-radius: 9px;
+      font-size: 0.86rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: 0.15s;
+    }
+    .tab-btn:hover { color: var(--text); border-color: var(--accent); }
+    .tab-btn.active { background: var(--primary); color: #052e16; border-color: var(--primary); }
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
+
+    /* Grid */
+    .grid-main {
+      display: grid;
+      grid-template-columns: 1.3fr 0.95fr;
+      gap: 16px;
+      align-items: start;
+    }
+    @media (max-width: 880px) { .grid-main { grid-template-columns: 1fr; } }
+
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 16px;
+      margin-bottom: 14px;
+      box-shadow: var(--shadow);
+    }
+    .card-title {
+      font-size: 0.94rem;
+      font-weight: 700;
+      margin-bottom: 12px;
+      color: #e2e8f0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .form-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+    .form-grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+    @media (max-width: 580px) { .form-grid, .form-grid-3 { grid-template-columns: 1fr; } }
+    .full { grid-column: 1 / -1; }
+
+    label { display: block; font-size: 0.76rem; color: var(--text-muted); margin-bottom: 4px; font-weight: 600; }
+    input, select, textarea {
+      width: 100%;
+      background: var(--bg-input);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 8px 10px;
+      border-radius: 8px;
+      font-size: 0.88rem;
+      outline: none;
+    }
+    input:focus, select:focus, textarea:focus { border-color: var(--primary); }
+
+    /* Botões */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding: 8px 13px;
+      border-radius: 8px;
+      font-size: 0.83rem;
+      font-weight: 600;
+      border: 1px solid transparent;
+      cursor: pointer;
+      transition: 0.15s;
+    }
+    .btn-primary { background: var(--primary); color: #052e16; }
+    .btn-primary:hover { background: var(--primary-hover); color: #fff; }
+    .btn-secondary { background: var(--bg-soft); color: var(--text); border-color: var(--border); }
+    .btn-secondary:hover { border-color: var(--accent); }
+    .btn-accent { background: rgba(56, 189, 248, 0.16); color: var(--accent); border-color: rgba(56, 189, 248, 0.4); }
+    .btn-accent:hover { background: rgba(56, 189, 248, 0.28); }
+    .btn-warn { background: rgba(245, 158, 11, 0.16); color: #fbbf24; border-color: rgba(245, 158, 11, 0.4); }
+    .btn-danger { background: rgba(239, 68, 68, 0.16); color: #fca5a5; border-color: rgba(239, 68, 68, 0.4); }
+    .btn-sm { padding: 5px 9px; font-size: 0.77rem; }
+
+    /* Barra compacta de importação */
+    .quick-bar {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      align-items: center;
+      background: var(--bg-input);
+      border: 1px dashed var(--border);
+      padding: 10px 12px;
+      border-radius: 10px;
+      margin-bottom: 14px;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+    .quick-bar.dragover { border-color: var(--primary); background: rgba(16, 185, 129, 0.08); }
+
+    /* Preview compacto de foto */
+    .img-chip {
+      display: none;
+      align-items: center;
+      gap: 10px;
+      background: var(--bg-input);
+      border: 1px solid var(--border);
+      padding: 6px 10px;
+      border-radius: 8px;
+      margin-top: 8px;
+    }
+    .img-chip.show { display: flex; }
+    .img-chip img { width: 46px; height: 46px; object-fit: cover; border-radius: 6px; cursor: zoom-in; }
+
+    /* Linhas AMS */
+    .ams-row {
+      display: grid;
+      grid-template-columns: 1.7fr 0.75fr auto;
+      gap: 8px;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+    @media (max-width: 500px) { .ams-row { grid-template-columns: 1fr 86px auto; } }
+
+    /* Acordeão de ajustes fixos */
+    details.settings-box {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 12px 16px;
+      margin-bottom: 14px;
+    }
+    details.settings-box summary {
+      cursor: pointer;
+      font-size: 0.84rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      list-style: none;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    details.settings-box summary::-webkit-details-marker { display: none; }
+    details.settings-box[open] summary { color: var(--text); margin-bottom: 12px; border-bottom: 1px solid var(--border); padding-bottom: 8px; }
+
+    /* Painel Resultado */
+    .sticky-panel { position: sticky; top: 12px; }
+    .kpi-hero {
+      background: linear-gradient(135deg, rgba(16, 185, 129, 0.18), rgba(56, 189, 248, 0.12));
+      border: 1px solid rgba(16, 185, 129, 0.4);
+      border-radius: 12px;
+      padding: 14px;
+      margin-bottom: 12px;
+    }
+    .kpi-row { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
+    .kpi-price { font-size: 1.75rem; font-weight: 800; color: var(--primary); }
+    .kpi-sub { font-size: 0.78rem; color: var(--text-muted); }
+
+    .breakdown-list { list-style: none; font-size: 0.83rem; }
+    .breakdown-list li {
+      display: flex;
+      justify-content: space-between;
+      padding: 5px 0;
+      border-bottom: 1px dashed rgba(148, 163, 184, 0.2);
+    }
+    .breakdown-list li:last-child { border-bottom: none; }
+
+    table { width: 100%; border-collapse: collapse; font-size: 0.8rem; }
+    th, td { padding: 7px 6px; text-align: left; border-bottom: 1px solid var(--border); }
+    th { color: var(--text-muted); font-weight: 600; }
+
+    /* Cards Catálogo e Projetos */
+    .cards-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(255px, 1fr));
+      gap: 12px;
+    }
+    .item-card {
+      background: var(--bg-input);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 13px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 10px;
+    }
+    .color-dot {
+      width: 13px;
+      height: 13px;
+      border-radius: 50%;
+      display: inline-block;
+      border: 1px solid rgba(255,255,255,0.4);
+      vertical-align: middle;
+      margin-right: 6px;
+    }
+
+    /* Modais */
+    .modal-backdrop {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(2, 6, 23, 0.78);
+      z-index: 999;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
+    .modal-backdrop.open { display: flex; }
+    .modal-box {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      max-width: 540px;
+      width: 100%;
+      max-height: 90vh;
+      overflow-y: auto;
+      padding: 18px;
+    }
+
+    .toast {
+      position: fixed;
+      bottom: 16px;
+      right: 16px;
+      background: #0f172a;
+      color: #f8fafc;
+      border: 1px solid var(--primary);
+      padding: 9px 15px;
+      border-radius: 10px;
+      font-size: 0.83rem;
+      box-shadow: var(--shadow);
+      z-index: 1200;
+      opacity: 0;
+      transform: translateY(10px);
+      pointer-events: none;
+      transition: 0.2s;
+    }
+    .toast.show { opacity: 1; transform: translateY(0); }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div id="sandboxBanner" class="sandbox-banner">
+      <span>⚠️ <strong>Modo Isolado (Google Sites):</strong> Salve seus dados clicando em <strong>Exportar Backup</strong>.</span>
+      <button class="btn btn-warn btn-sm" onclick="exportBackup()">⬇️ Exportar Backup</button>
+    </div>
+
+    <header>
+      <div class="brand">
+        <h1>Precifica3D <span class="badge">Bambu Lab A1 + AMS</span></h1>
+      </div>
+      <div class="header-actions">
+        <button class="btn btn-secondary btn-sm" onclick="exportBackup()">⬇️ Backup (.json)</button>
+        <label class="btn btn-secondary btn-sm" style="margin:0; cursor:pointer;">
+          ⬆️ Restaurar
+          <input type="file" accept=".json" style="display:none;" onchange="importBackup(event)" />
+        </label>
+      </div>
+    </header>
+
+    <nav class="tabs">
+      <button class="tab-btn active" data-tab="calc" onclick="switchTab('calc')">🧮 Calculadora</button>
+      <button class="tab-btn" data-tab="filaments" onclick="switchTab('filaments')">🧵 Filamentos (<span id="filamentCountBadge">0</span>)</button>
+      <button class="tab-btn" data-tab="projects" onclick="switchTab('projects')">📁 Projetos (<span id="projectCountBadge">0</span>)</button>
+    </nav>
+
+    <!-- ABA 1: CALCULADORA DIRETA -->
+    <section id="tab-calc" class="tab-panel active">
+      <div class="grid-main">
+        <div>
+          <!-- Importação rápida -->
+          <div id="3mfDropzone" class="quick-bar">
+            <span style="flex:1;">⚡ <strong>Bambu Studio:</strong> arraste um <code>.gcode.3mf</code> ou importe:</span>
+            <button class="btn btn-secondary btn-sm" onclick="document.getElementById('3mfFileInput').click()">📂 Arquivo .3mf</button>
+            <button class="btn btn-accent btn-sm" onclick="openPasteModal()">📋 Colar Resumo</button>
+            <input type="file" id="3mfFileInput" accept=".3mf" style="display:none;" onchange="handle3mfFile(event.target.files[0])" />
+          </div>
+
+          <!-- Projeto, Cliente e Foto compacta -->
+          <div class="card">
+            <div class="card-title">
+              <span>📦 Projeto & Cliente</span>
+              <button class="btn btn-secondary btn-sm" onclick="document.getElementById('imgFileInput').click()">📷 Anexar Foto (ou Ctrl+V)</button>
+              <input type="file" id="imgFileInput" accept="image/*" style="display:none;" onchange="handleImageFile(event.target.files[0])" />
+            </div>
+            <div class="form-grid">
+              <div class="full">
+                <label>Nome da Peça / Projeto</label>
+                <input type="text" id="projectName" placeholder="Ex.: Chaveiro Personalizado" oninput="calculate()" />
+              </div>
+              <div>
+                <label>Cliente</label>
+                <input type="text" id="clientName" placeholder="Nome do cliente" oninput="calculate()" />
+              </div>
+              <div>
+                <label>WhatsApp / Telefone</label>
+                <input type="text" id="clientPhone" placeholder="(65) 99999-9999" oninput="maskPhone(this)" />
+              </div>
+            </div>
+            <div id="imgChip" class="img-chip">
+              <img id="imgPreview" src="" alt="Preview" onclick="openLightbox(this.src)" />
+              <span style="flex:1; font-size:0.78rem; color:var(--text-muted);">Foto anexada (clique para ampliar)</span>
+              <button class="btn btn-danger btn-sm" onclick="removeProjectImage()">✕</button>
+            </div>
+          </div>
+
+          <!-- Filamentos AMS (Total por cor = Peça + Purga + Torre) -->
+          <div class="card">
+            <div class="card-title">
+              <span>🎨 Filamentos Usados por Cor (Peça + Purga/Torre em g)</span>
+              <button class="btn btn-secondary btn-sm" onclick="addAmsRow()">+ Cor</button>
+            </div>
+            <div id="amsRowsContainer"></div>
+            <div class="form-grid" style="margin-top:10px;">
+              <div>
+                <label>Margem Extra de Perda/Purga (%)</label>
+                <input type="number" id="extraWastePct" value="0" min="0" step="5" title="Use apenas se não tiver o peso fatiado com purga" oninput="calculate()" />
+              </div>
+              <div>
+                <label>Peças na Mesa (Lote)</label>
+                <input type="number" id="batchQty" value="1" min="1" step="1" oninput="calculate()" />
+              </div>
+            </div>
+          </div>
+
+          <!-- Tempo, Acabamento, Margem e Canal -->
+          <div class="card">
+            <div class="card-title"><span>⏱️ Tempo, Acabamento & Venda</span></div>
+            <div class="form-grid-3">
+              <div>
+                <label>Horas</label>
+                <input type="number" id="printHours" value="2" min="0" step="1" oninput="calculate()" />
+              </div>
+              <div>
+                <label>Minutos</label>
+                <input type="number" id="printMinutes" value="0" min="0" max="59" step="1" oninput="calculate()" />
+              </div>
+              <div>
+                <label>Acabamento Manual (min)</label>
+                <input type="number" id="laborMinutes" value="5" min="0" step="1" oninput="calculate()" />
+              </div>
+              <div>
+                <label>Extras Unit. (Argola/Caixa R$)</label>
+                <input type="number" id="extraCost" value="0.00" min="0" step="0.1" oninput="calculate()" />
+              </div>
+              <div>
+                <label>Margem de Lucro (%)</label>
+                <input type="number" id="profitMargin" value="100" min="0" step="5" oninput="calculate()" />
+              </div>
+              <div>
+                <label>Canal de Venda</label>
+                <select id="salesChannel" onchange="calculate()">
+                  <option value="0">Pix / Direto (0%)</option>
+                  <option value="4.5">Cartão (~4,5%)</option>
+                  <option value="14">Mercado Livre (~14%)</option>
+                  <option value="20">Shopee (~20%)</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <!-- Ajustes Fixos Recolhidos -->
+          <details class="settings-box">
+            <summary>
+              <span>⚙️ Ajustes Fixos da Bambu A1 & Energia MT</span>
+              <span id="fixedSummaryLabel" style="color:var(--accent); font-size:0.78rem;">100W • R$ 1,19/kWh • Manut. R$ 0,80/h</span>
+            </summary>
+            <div class="form-grid">
+              <div>
+                <label>Consumo Médio A1 (W/h)</label>
+                <input type="number" id="printerWatts" value="100" min="1" step="1" oninput="saveMachineSettings(); calculate();" />
+              </div>
+              <div>
+                <label>Tarifa Energia MT (R$/kWh)</label>
+                <input type="number" id="kwhPrice" value="1.19" min="0" step="0.01" oninput="saveMachineSettings(); calculate();" />
+              </div>
+              <div>
+                <label>Manutenção / Bico (R$/h)</label>
+                <input type="number" id="maintenanceRate" value="0.80" min="0" step="0.1" oninput="saveMachineSettings(); calculate();" />
+              </div>
+              <div>
+                <label>Hora Técnica Acabamento (R$)</label>
+                <input type="number" id="laborHourRate" value="25.00" min="0" step="1" oninput="saveMachineSettings(); calculate();" />
+              </div>
+            </div>
+          </details>
+        </div>
+
+        <!-- COLUNA DIREITA: RESULTADO + AÇÕES COMERCIAIS -->
+        <div class="sticky-panel">
+          <div class="card">
+            <div class="card-title"><span>💰 Resumo & Orçamento</span></div>
+            <div class="kpi-hero">
+              <div class="kpi-row">
+                <div>
+                  <div class="kpi-sub">Preço Unitário</div>
+                  <div id="unitPriceDisplay" class="kpi-price">R$ 0,00</div>
+                </div>
+                <div style="text-align:right;">
+                  <div class="kpi-sub">Total (<span id="batchQtyLabel">1</span>x)</div>
+                  <div id="totalPriceDisplay" style="font-size:1.25rem; font-weight:700; color:#38bdf8;">R$ 0,00</div>
+                </div>
+              </div>
+              <div class="kpi-row" style="margin-top:8px; padding-top:8px; border-top:1px solid rgba(255,255,255,0.1);">
+                <span class="kpi-sub">Custo Unit.: <strong id="unitCostDisplay" style="color:#f1f5f9;">R$ 0,00</strong></span>
+                <span class="kpi-sub">Lucro Líquido: <strong id="netProfitDisplay" style="color:#10b981;">R$ 0,00</strong></span>
+              </div>
+            </div>
+
+            <ul class="breakdown-list">
+              <li><span>Filamento Total (<span id="partWeightSummary">0g</span>)</span><strong id="partFilCostDisplay">R$ 0,00</strong></li>
+              <li><span>Energia (<span id="kwhSummary">0,00 kWh</span>)</span><strong id="energyCostDisplay">R$ 0,00</strong></li>
+              <li><span>Manutenção A1</span><strong id="maintCostDisplay">R$ 0,00</strong></li>
+              <li><span>Acabamento + Extras</span><strong id="laborExtraDisplay">R$ 0,00</strong></li>
+              <li><span>Taxa Canal / Maquininha</span><strong id="channelFeeDisplay">R$ 0,00</strong></li>
+            </ul>
+
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:12px;">
+              <button class="btn btn-primary" onclick="sendWhatsAppQuote()">📲 Enviar WhatsApp</button>
+              <button class="btn btn-accent" onclick="openQuoteOptionsModal()">🖨️ PDF / Proposta</button>
+              <button class="btn btn-secondary" onclick="saveCurrentProject()">💾 Salvar Projeto</button>
+              <button class="btn btn-warn" onclick="deductStockFromCurrent()">📉 Abater Estoque</button>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-title"><span>📊 Preço por Quantidade (Lote)</span></div>
+            <table>
+              <thead>
+                <tr>
+                  <th>Qtd.</th>
+                  <th>Custo Unit.</th>
+                  <th>Preço Unit.</th>
+                  <th>Total</th>
+                </tr>
+              </thead>
+              <tbody id="scaleTableBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ABA 2: FILAMENTOS -->
+    <section id="tab-filaments" class="tab-panel">
+      <div class="card">
+        <div class="card-title"><span id="filamentFormTitle">➕ Cadastrar Rolo de Filamento (1 kg)</span></div>
+        <input type="hidden" id="editFilamentId" />
+        <div class="form-grid-3">
+          <div>
+            <label>Cor / Nome</label>
+            <input type="text" id="filName" placeholder="Ex.: Branco Neve" />
+          </div>
+          <div>
+            <label>Material</label>
+            <select id="filMaterial">
+              <option value="PLA">PLA</option>
+              <option value="PLA Silk">PLA Silk</option>
+              <option value="PETG">PETG</option>
+              <option value="ABS">ABS</option>
+              <option value="ASA">ASA</option>
+              <option value="TPU">TPU</option>
+            </select>
+          </div>
+          <div>
+            <label>Valor do Rolo (R$)</label>
+            <input type="number" id="filRollPrice" value="110.00" min="0" step="0.01" />
+          </div>
+          <div>
+            <label>Peso do Rolo (g)</label>
+            <input type="number" id="filRollWeight" value="1000" min="1" />
+          </div>
+          <div>
+            <label>Saldo em Estoque (g)</label>
+            <input type="number" id="filStockGrams" value="1000" min="0" />
+          </div>
+          <div style="display:flex; gap:8px; align-items:flex-end;">
+            <input type="color" id="filColor" value="#10b981" style="width:48px; height:38px; padding:2px;" title="Cor" />
+            <button class="btn btn-primary" style="flex:1;" onclick="saveFilament()">💾 Salvar</button>
+            <button class="btn btn-secondary" onclick="resetFilamentForm()">Limpar</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">
+          <span>🧵 Rolos Cadastrados</span>
+          <input type="text" id="searchFilament" placeholder="Filtrar..." style="max-width:220px;" oninput="renderFilaments()" />
+        </div>
+        <div id="filamentsGrid" class="cards-grid"></div>
+      </div>
+    </section>
+
+    <!-- ABA 3: PROJETOS SALVOS -->
+    <section id="tab-projects" class="tab-panel">
+      <div class="card">
+        <div class="card-title">
+          <span>📁 Projetos Salvos</span>
+          <input type="text" id="searchProject" placeholder="Buscar projeto ou cliente..." style="max-width:240px;" oninput="renderProjects()" />
+        </div>
+        <div id="projectsGrid" class="cards-grid"></div>
+      </div>
+    </section>
+  </div>
+
+  <!-- Modal Colar Resumo Bambu Studio -->
+  <div id="pasteModal" class="modal-backdrop">
+    <div class="modal-box">
+      <div class="card-title">
+        <span>📋 Colar Resumo do Bambu Studio</span>
+        <button class="btn btn-secondary btn-sm" onclick="closePasteModal()">✕</button>
+      </div>
+      <p style="font-size:0.8rem; color:var(--text-muted); margin-bottom:8px;">
+        Cole o resumo da aba <strong>Pré-visualização</strong> do Bambu Studio (tempo e gramas totais):
+      </p>
+      <textarea id="bambuPasteText" rows="5" placeholder="Ex.: Total time: 1h 45m | Total: 54.2g"></textarea>
+      <div style="display:flex; justify-content:flex-end; gap:8px; margin-top:10px;">
+        <button class="btn btn-secondary" onclick="closePasteModal()">Cancelar</button>
+        <button class="btn btn-primary" onclick="parseBambuText()">Aplicar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Rápido de Proposta PDF / Texto -->
+  <div id="quoteModal" class="modal-backdrop">
+    <div class="modal-box">
+      <div class="card-title">
+        <span>📄 Gerar Proposta Comercial</span>
+        <button class="btn btn-secondary btn-sm" onclick="closeQuoteModal()">✕</button>
+      </div>
+      <div class="form-grid" style="margin-bottom:10px;">
+        <div>
+          <label>Nome do Seu Estúdio</label>
+          <input type="text" id="studioName" value="Impressão 3D" />
+        </div>
+        <div>
+          <label>Prazo de Entrega</label>
+          <input type="text" id="deliveryDays" value="3 dias úteis" />
+        </div>
+        <div class="full">
+          <label>Observações / Pagamento</label>
+          <textarea id="quoteNotes" rows="2">Pagamento via Pix (50% no pedido e 50% na entrega) ou cartão.</textarea>
+        </div>
+      </div>
+      <div style="display:flex; flex-wrap:wrap; gap:8px; justify-content:flex-end;">
+        <button class="btn btn-secondary" onclick="copyWhatsAppText()">📋 Copiar Texto</button>
+        <button class="btn btn-primary" onclick="sendWhatsAppQuote()">📲 WhatsApp</button>
+        <button class="btn btn-accent" onclick="printProposalWindow()">🖨️ Imprimir / PDF A4</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Lightbox Imagem -->
+  <div id="lightboxModal" class="modal-backdrop" onclick="this.classList.remove('open')">
+    <img id="lightboxImg" src="" alt="Ampliada" style="max-width:92vw; max-height:88vh; border-radius:12px; border:2px solid #fff;" />
+  </div>
+
+  <div id="toast" class="toast"></div>
+
+  <script>
+    // =========================================================================
+    // 1. ARMAZENAMENTO SEGURO (BLINDADO CONTRA SANDBOX GOOGLE SITES)
+    // =========================================================================
+    const SafeStorage = (() => {
+      let memoryStore = {};
+      let isSandboxed = false;
+      try {
+        const k = "__p3d_test__";
+        window.localStorage.setItem(k, "1");
+        window.localStorage.removeItem(k);
+      } catch (e) {
+        isSandboxed = true;
+      }
+      if (isSandboxed) {
+        document.addEventListener("DOMContentLoaded", () => {
+          document.getElementById("sandboxBanner")?.classList.add("show");
+        });
+      }
+      return {
+        getItem(key) {
+          if (!isSandboxed) {
+            try { return window.localStorage.getItem(key); } catch (e) {}
+          }
+          return Object.prototype.hasOwnProperty.call(memoryStore, key) ? memoryStore[key] : null;
+        },
+        setItem(key, val) {
+          memoryStore[key] = val;
+          if (!isSandboxed) {
+            try {
+              window.localStorage.setItem(key, val);
+              return { ok: true };
+            } catch (e) {
+              return { ok: false, error: e };
+            }
+          }
+          return { ok: true, sandboxed: true };
+        }
+      };
+    })();
+
+    const STORAGE_FILAMENTS_KEY = "precifica3d_filaments_v1";
+    const STORAGE_PROJECTS_KEY = "precifica3d_projects_v2";
+    const STORAGE_SETTINGS_KEY = "precifica3d_settings_v1";
+
+    const DEFAULT_FILAMENTS = [
+      { id: "fil_1", name: "Branco Neve", material: "PLA", color: "#f8fafc", rollWeight: 1000, rollPrice: 109.90, stockGrams: 1000 },
+      { id: "fil_2", name: "Preto Fosco", material: "PLA", color: "#1e293b", rollWeight: 1000, rollPrice: 115.00, stockGrams: 1000 },
+      { id: "fil_3", name: "Vermelho", material: "PLA", color: "#ef4444", rollWeight: 1000, rollPrice: 129.00, stockGrams: 1000 },
+      { id: "fil_4", name: "Cinza Técnico", material: "PETG", color: "#64748b", rollWeight: 1000, rollPrice: 124.00, stockGrams: 1000 }
+    ];
+
+    let filaments = [];
+    let projects = [];
+    let amsRows = [];
+    let currentProjectImage = "";
+    let lastCalc = {};
+
+    function showToast(msg) {
+      const el = document.getElementById("toast");
+      el.textContent = msg;
+      el.classList.add("show");
+      clearTimeout(el._t);
+      el._t = setTimeout(() => el.classList.remove("show"), 3000);
+    }
+
+    function formatBRL(val) {
+      const n = Number.isFinite(val) ? val : 0;
+      return n.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+    }
+
+    function maskPhone(input) {
+      let v = input.value.replace(/\D/g, "").slice(0, 11);
+      if (v.length > 10) v = v.replace(/^(\d{2})(\d{5})(\d{4}).*/, "($1) $2-$3");
+      else if (v.length > 6) v = v.replace(/^(\d{2})(\d{4})(\d{0,4}).*/, "($1) $2-$3");
+      else if (v.length > 2) v = v.replace(/^(\d{2})(\d{0,5})/, "($1) $2");
+      else if (v.length > 0) v = v.replace(/^(\d*)/, "($1");
+      input.value = v;
+    }
+
+    // =========================================================================
+    // 2. ESTADO INICIAL & AJUSTES FIXOS
+    // =========================================================================
+    function loadState() {
+      try {
+        const rawFil = SafeStorage.getItem(STORAGE_FILAMENTS_KEY);
+        filaments = rawFil ? JSON.parse(rawFil) : [...DEFAULT_FILAMENTS];
+        if (!Array.isArray(filaments) || !filaments.length) filaments = [...DEFAULT_FILAMENTS];
+      } catch (e) { filaments = [...DEFAULT_FILAMENTS]; }
+
+      try {
+        const rawProj = SafeStorage.getItem(STORAGE_PROJECTS_KEY);
+        projects = rawProj ? JSON.parse(rawProj) : [];
+        if (!Array.isArray(projects)) projects = [];
+      } catch (e) { projects = []; }
+
+      try {
+        const rawSet = SafeStorage.getItem(STORAGE_SETTINGS_KEY);
+        if (rawSet) {
+          const s = JSON.parse(rawSet);
+          if (s.printerWatts) document.getElementById("printerWatts").value = s.printerWatts;
+          if (s.kwhPrice) document.getElementById("kwhPrice").value = s.kwhPrice;
+          if (s.maintenanceRate) document.getElementById("maintenanceRate").value = s.maintenanceRate;
+          if (s.laborHourRate) document.getElementById("laborHourRate").value = s.laborHourRate;
+          if (s.studioName) document.getElementById("studioName").value = s.studioName;
+        }
+      } catch (e) {}
+      updateFixedSummaryLabel();
+    }
+
+    function saveMachineSettings() {
+      const data = {
+        printerWatts: parseFloat(document.getElementById("printerWatts").value) || 100,
+        kwhPrice: parseFloat(document.getElementById("kwhPrice").value) || 1.19,
+        maintenanceRate: parseFloat(document.getElementById("maintenanceRate").value) || 0.80,
+        laborHourRate: parseFloat(document.getElementById("laborHourRate").value) || 25,
+        studioName: document.getElementById("studioName").value || "Impressão 3D"
+      };
+      SafeStorage.setItem(STORAGE_SETTINGS_KEY, JSON.stringify(data));
+      updateFixedSummaryLabel();
+    }
+
+    function updateFixedSummaryLabel() {
+      const w = document.getElementById("printerWatts").value || 100;
+      const kwh = parseFloat(document.getElementById("kwhPrice").value || 1.19).toFixed(2).replace(".", ",");
+      const m = parseFloat(document.getElementById("maintenanceRate").value || 0.80).toFixed(2).replace(".", ",");
+      document.getElementById("fixedSummaryLabel").textContent = `${w}W • R$ ${kwh}/kWh • Manut. R$ ${m}/h`;
+    }
+
+    function persistFilaments() {
+      SafeStorage.setItem(STORAGE_FILAMENTS_KEY, JSON.stringify(filaments));
+      document.getElementById("filamentCountBadge").textContent = filaments.length;
+    }
+
+    function persistProjects() {
+      const res = SafeStorage.setItem(STORAGE_PROJECTS_KEY, JSON.stringify(projects));
+      document.getElementById("projectCountBadge").textContent = projects.length;
+      return res;
+    }
+
+    function switchTab(tab) {
+      document.querySelectorAll(".tab-btn").forEach(b => b.classList.toggle("active", b.dataset.tab === tab));
+      document.querySelectorAll(".tab-panel").forEach(p => p.classList.toggle("active", p.id === "tab-" + tab));
+      if (tab === "filaments") renderFilaments();
+      if (tab === "projects") renderProjects();
+    }
+
+    // =========================================================================
+    // 3. LINHAS DE FILAMENTO (PESO REAL POR COR = PEÇA + PURGA + TORRE)
+    // =========================================================================
+    function ensureFilamentExists(filId, fallbackName = "Filamento Restaurado", fallbackCostPerGram = 0.11) {
+      let found = filaments.find(f => f.id === filId);
+      if (!found && filId) {
+        found = {
+          id: filId,
+          name: fallbackName,
+          material: "PLA",
+          color: "#94a3b8",
+          rollWeight: 1000,
+          rollPrice: Number((fallbackCostPerGram * 1000).toFixed(2)),
+          stockGrams: 0
+        };
+        filaments.push(found);
+        persistFilaments();
+      }
+      return found || filaments[0];
+    }
+
+    function addAmsRow(filamentId = null, grams = 25) {
+      amsRows.push({
+        uid: "r_" + Date.now() + "_" + Math.random().toString(36).slice(2, 6),
+        filamentId: filamentId || filaments[0].id,
+        grams
+      });
+      renderAmsRows();
+      calculate();
+    }
+
+    function removeAmsRow(uid) {
+      if (amsRows.length <= 1) {
+        showToast("Mantenha pelo menos 1 filamento.");
+        return;
+      }
+      amsRows = amsRows.filter(r => r.uid !== uid);
+      renderAmsRows();
+      calculate();
+    }
+
+    function renderAmsRows() {
+      const container = document.getElementById("amsRowsContainer");
+      container.innerHTML = "";
+      amsRows.forEach(row => {
+        const div = document.createElement("div");
+        div.className = "ams-row";
+
+        const sel = document.createElement("select");
+        filaments.forEach(f => {
+          const opt = document.createElement("option");
+          opt.value = f.id;
+          const perKg = f.rollWeight > 0 ? (f.rollPrice / (f.rollWeight / 1000)) : 0;
+          opt.textContent = `${f.name} (${f.material} • ${formatBRL(perKg)}/kg)`;
+          if (f.id === row.filamentId) opt.selected = true;
+          sel.appendChild(opt);
+        });
+        sel.onchange = (e) => { row.filamentId = e.target.value; calculate(); };
+
+        const inp = document.createElement("input");
+        inp.type = "number";
+        inp.min = "0";
+        inp.step = "0.1";
+        inp.value = row.grams;
+        inp.placeholder = "g";
+        inp.oninput = (e) => { row.grams = parseFloat(e.target.value) || 0; calculate(); };
+
+        const btn = document.createElement("button");
+        btn.className = "btn btn-danger btn-sm";
+        btn.textContent = "✕";
+        btn.onclick = () => removeAmsRow(row.uid);
+
+        div.appendChild(sel);
+        div.appendChild(inp);
+        div.appendChild(btn);
+        container.appendChild(div);
+      });
+    }
+
+    // =========================================================================
+    // 4. CÁLCULO FINANCEIRO E ESCALA DE LOTE
+    // =========================================================================
+    function getCostPerGram(filamentId) {
+      const f = filaments.find(x => x.id === filamentId) || filaments[0];
+      return (f && f.rollWeight > 0) ? (f.rollPrice / f.rollWeight) : 0;
+    }
+
+    function computeForBatch(qty) {
+      const batchQty = Math.max(1, parseInt(qty, 10) || 1);
+      const currentBatch = Math.max(1, parseInt(document.getElementById("batchQty").value, 10) || 1);
+      const wasteFactor = 1 + (Math.max(0, parseFloat(document.getElementById("extraWastePct").value) || 0) / 100);
+
+      // Gramas informadas nas linhas referem-se à mesa atual (currentBatch)
+      let tableGrams = 0;
+      let tableFilCost = 0;
+      amsRows.forEach(r => {
+        const g = Math.max(0, parseFloat(r.grams) || 0) * wasteFactor;
+        tableGrams += g;
+        tableFilCost += g * getCostPerGram(r.filamentId);
+      });
+
+      const unitGrams = tableGrams / currentBatch;
+      const unitFilCost = tableFilCost / currentBatch;
+      const scaledGrams = unitGrams * batchQty;
+      const scaledFilCost = unitFilCost * batchQty;
+
+      const baseHours = (parseFloat(document.getElementById("printHours").value) || 0) +
+                        ((parseFloat(document.getElementById("printMinutes").value) || 0) / 60);
+      const setupHours = Math.min(baseHours * 0.15, 0.15); // ~9 min nivelamento fixo
+      const varHoursPerUnit = Math.max(0, (baseHours - setupHours) / currentBatch);
+      const scaledHours = batchQty === currentBatch ? baseHours : (setupHours + varHoursPerUnit * batchQty);
+
+      const watts = Math.max(0, parseFloat(document.getElementById("printerWatts").value) || 100);
+      const kwhPrice = Math.max(0, parseFloat(document.getElementById("kwhPrice").value) || 1.19);
+      const totalKwh = (watts / 1000) * scaledHours;
+      const totalEnergyCost = totalKwh * kwhPrice;
+
+      const maintRate = Math.max(0, parseFloat(document.getElementById("maintenanceRate").value) || 0);
+      const totalMaintCost = scaledHours * maintRate;
+
+      const laborMinUnit = Math.max(0, parseFloat(document.getElementById("laborMinutes").value) || 0);
+      const laborRate = Math.max(0, parseFloat(document.getElementById("laborHourRate").value) || 0);
+      const unitLaborCost = (laborMinUnit / 60) * laborRate;
+      const unitExtraCost = Math.max(0, parseFloat(document.getElementById("extraCost").value) || 0);
+      const totalLaborExtra = (unitLaborCost + unitExtraCost) * batchQty;
+
+      const totalBatchCost = scaledFilCost + totalEnergyCost + totalMaintCost + totalLaborExtra;
+      const unitCost = totalBatchCost / batchQty;
+
+      const marginPct = Math.max(0, parseFloat(document.getElementById("profitMargin").value) || 0);
+      const channelPct = Math.max(0, parseFloat(document.getElementById("salesChannel").value) || 0);
+
+      const priceBeforeFee = unitCost * (1 + marginPct / 100);
+      const unitFinalPrice = priceBeforeFee / Math.max(0.1, 1 - channelPct / 100);
+      const totalFinalPrice = unitFinalPrice * batchQty;
+      const totalChannelFee = (unitFinalPrice - priceBeforeFee) * batchQty;
+      const netProfitTotal = totalFinalPrice - totalBatchCost - totalChannelFee;
+
+      return {
+        batchQty,
+        scaledGrams,
+        scaledFilCost,
+        totalKwh,
+        totalEnergyCost,
+        totalMaintCost,
+        totalLaborExtra,
+        totalChannelFee,
+        unitCost,
+        unitFinalPrice,
+        totalFinalPrice,
+        netProfitTotal
+      };
+    }
+
+    function calculate() {
+      const qty = Math.max(1, parseInt(document.getElementById("batchQty").value, 10) || 1);
+      const res = computeForBatch(qty);
+      lastCalc = res;
+
+      document.getElementById("batchQtyLabel").textContent = res.batchQty;
+      document.getElementById("unitPriceDisplay").textContent = formatBRL(res.unitFinalPrice);
+      document.getElementById("totalPriceDisplay").textContent = formatBRL(res.totalFinalPrice);
+      document.getElementById("unitCostDisplay").textContent = formatBRL(res.unitCost);
+      document.getElementById("netProfitDisplay").textContent = formatBRL(res.netProfitTotal);
+
+      document.getElementById("partWeightSummary").textContent = `${res.scaledGrams.toFixed(1)}g`;
+      document.getElementById("partFilCostDisplay").textContent = formatBRL(res.scaledFilCost);
+      document.getElementById("kwhSummary").textContent = `${res.totalKwh.toFixed(2)} kWh`;
+      document.getElementById("energyCostDisplay").textContent = formatBRL(res.totalEnergyCost);
+      document.getElementById("maintCostDisplay").textContent = formatBRL(res.totalMaintCost);
+      document.getElementById("laborExtraDisplay").textContent = formatBRL(res.totalLaborExtra);
+      document.getElementById("channelFeeDisplay").textContent = formatBRL(res.totalChannelFee);
+
+      const tbody = document.getElementById("scaleTableBody");
+      tbody.innerHTML = "";
+      [1, 5, 10, 25].forEach(q => {
+        const s = computeForBatch(q);
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td><strong>${q}x</strong></td>
+          <td>${formatBRL(s.unitCost)}</td>
+          <td style="color:var(--primary); font-weight:700;">${formatBRL(s.unitFinalPrice)}</td>
+          <td>${formatBRL(s.totalFinalPrice)}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    // =========================================================================
+    // 5. FOTO COMPACTA & IMPORTAÇÃO BAMBU STUDIO (.3MF / TEXTO)
+    // =========================================================================
+    function compressImageDataUrl(dataUrl, maxDim = 480, quality = 0.68) {
+      return new Promise((resolve, reject) => {
+        const img = new Image();
+        img.onload = () => {
+          let w = img.width, h = img.height;
+          if (w > maxDim || h > maxDim) {
+            if (w > h) { h = Math.round((h * maxDim) / w); w = maxDim; }
+            else { w = Math.round((w * maxDim) / h); h = maxDim; }
+          }
+          const canvas = document.createElement("canvas");
+          canvas.width = w; canvas.height = h;
+          canvas.getContext("2d").drawImage(img, 0, 0, w, h);
+          resolve(canvas.toDataURL("image/jpeg", quality));
+        };
+        img.onerror = reject;
+        img.src = dataUrl;
+      });
+    }
+
+    function handleImageFile(file) {
+      if (!file || !file.type.startsWith("image/")) return;
+      const reader = new FileReader();
+      reader.onload = async (e) => {
+        try {
+          setProjectImage(await compressImageDataUrl(e.target.result));
+          showToast("Foto anexada!");
+        } catch (err) { showToast("Erro ao processar foto."); }
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function setProjectImage(dataUrl) {
+      currentProjectImage = dataUrl || "";
+      const chip = document.getElementById("imgChip");
+      const img = document.getElementById("imgPreview");
+      if (currentProjectImage) {
+        img.src = currentProjectImage;
+        chip.classList.add("show");
+      } else {
+        img.src = "";
+        chip.classList.remove("show");
+      }
+    }
+
+    function removeProjectImage() {
+      setProjectImage("");
+      document.getElementById("imgFileInput").value = "";
+    }
+
+    function openLightbox(src) {
+      if (!src) return;
+      document.getElementById("lightboxImg").src = src;
+      document.getElementById("lightboxModal").classList.add("open");
+    }
+
+    document.addEventListener("paste", (e) => {
+      if (!e.clipboardData?.items) return;
+      for (const item of e.clipboardData.items) {
+        if (item.type.startsWith("image/")) {
+          handleImageFile(item.getAsFile());
+          break;
+        }
+      }
+    });
+
+    async function handle3mfFile(file) {
+      if (!file) return;
+      if (typeof JSZip === "undefined") {
+        showToast("Use 'Colar Resumo' no modo offline.");
+        return;
+      }
+      try {
+        const zip = await JSZip.loadAsync(file);
+        const sliceFile = zip.file("Metadata/slice_info.config");
+        if (sliceFile) {
+          const xml = await sliceFile.async("text");
+          const timeMatch = xml.match(/key="prediction"\s+value="(\d+)"/);
+          if (timeMatch) {
+            const sec = parseInt(timeMatch[1], 10);
+            document.getElementById("printHours").value = Math.floor(sec / 3600);
+            document.getElementById("printMinutes").value = Math.round((sec % 3600) / 60);
+          }
+          const weights = [...xml.matchAll(/used_g="([\d.]+)"/g)];
+          if (weights.length) {
+            amsRows = [];
+            weights.forEach((m, idx) => {
+              const g = parseFloat(m[1]) || 0;
+              if (g > 0) {
+                amsRows.push({
+                  uid: "r_" + idx + "_" + Date.now(),
+                  filamentId: filaments[idx % filaments.length].id,
+                  grams: g
+                });
+              }
+            });
+            if (!amsRows.length) addAmsRow(null, 20);
+            renderAmsRows();
+          }
+        }
+        const thumb = zip.file("Metadata/plate_1.png") || zip.file("Auxiliaries/.thumbnails/thumbnail_300x300.png");
+        if (thumb) {
+          const b64 = await thumb.async("base64");
+          setProjectImage(await compressImageDataUrl("data:image/png;base64," + b64));
+        }
+        if (!document.getElementById("projectName").value) {
+          document.getElementById("projectName").value = file.name.replace(/\.gcode\.3mf$|\.3mf$/i, "");
+        }
+        calculate();
+        showToast("Arquivo .3mf importado!");
+      } catch (e) {
+        showToast("Não foi possível ler o .3mf.");
+      }
+    }
+
+    function openPasteModal() { document.getElementById("pasteModal").classList.add("open"); }
+    function closePasteModal() { document.getElementById("pasteModal").classList.remove("open"); }
+
+    function parseBambuText() {
+      const txt = document.getElementById("bambuPasteText").value;
+      const h = txt.match(/(\d+)\s*h/i);
+      const m = txt.match(/(\d+)\s*m(?:in)?/i);
+      if (h) document.getElementById("printHours").value = parseInt(h[1], 10);
+      if (m) document.getElementById("printMinutes").value = parseInt(m[1], 10);
+
+      const totalMatch = txt.match(/(?:Total|Model|Peça)\s*:?\s*([\d.,]+)\s*g/i);
+      if (totalMatch && amsRows[0]) {
+        amsRows[0].grams = parseFloat(totalMatch[1].replace(",", ".")) || 0;
+        renderAmsRows();
+      }
+      calculate();
+      closePasteModal();
+      showToast("Dados aplicados!");
+    }
+
+    // =========================================================================
+    // 6. FILAMENTOS & ESTOQUE
+    // =========================================================================
+    function saveFilament() {
+      const id = document.getElementById("editFilamentId").value;
+      const name = document.getElementById("filName").value.trim();
+      const material = document.getElementById("filMaterial").value;
+      const color = document.getElementById("filColor").value;
+      const rollWeight = Math.max(1, parseFloat(document.getElementById("filRollWeight").value) || 1000);
+      const rollPrice = Math.max(0, parseFloat(document.getElementById("filRollPrice").value) || 0);
+      const stockGrams = Math.max(0, parseFloat(document.getElementById("filStockGrams").value) || 0);
+
+      if (!name) { showToast("Informe a cor/nome do filamento."); return; }
+
+      if (id) {
+        const idx = filaments.findIndex(f => f.id === id);
+        if (idx !== -1) filaments[idx] = { id, name, material, color, rollWeight, rollPrice, stockGrams };
+      } else {
+        filaments.push({ id: "fil_" + Date.now(), name, material, color, rollWeight, rollPrice, stockGrams });
+      }
+      persistFilaments();
+      resetFilamentForm();
+      renderFilaments();
+      renderAmsRows();
+      calculate();
+      showToast("Filamento salvo!");
+    }
+
+    function editFilament(id) {
+      const f = filaments.find(x => x.id === id);
+      if (!f) return;
+      document.getElementById("editFilamentId").value = f.id;
+      document.getElementById("filName").value = f.name;
+      document.getElementById("filMaterial").value = f.material;
+      document.getElementById("filColor").value = f.color;
+      document.getElementById("filRollWeight").value = f.rollWeight;
+      document.getElementById("filRollPrice").value = f.rollPrice;
+      document.getElementById("filStockGrams").value = f.stockGrams;
+      document.getElementById("filamentFormTitle").textContent = "✏️ Editando: " + f.name;
+    }
+
+    function deleteFilament(id) {
+      if (filaments.length <= 1) { showToast("Mantenha pelo menos 1 filamento."); return; }
+      filaments = filaments.filter(f => f.id !== id);
+      persistFilaments();
+      renderFilaments();
+      renderAmsRows();
+      calculate();
+      showToast("Filamento excluído.");
+    }
+
+    function resetFilamentForm() {
+      document.getElementById("editFilamentId").value = "";
+      document.getElementById("filName").value = "";
+      document.getElementById("filRollPrice").value = "110.00";
+      document.getElementById("filRollWeight").value = "1000";
+      document.getElementById("filStockGrams").value = "1000";
+      document.getElementById("filamentFormTitle").textContent = "➕ Cadastrar Rolo de Filamento (1 kg)";
+    }
+
+    function renderFilaments() {
+      const q = (document.getElementById("searchFilament").value || "").toLowerCase();
+      const grid = document.getElementById("filamentsGrid");
+      grid.innerHTML = "";
+      filaments
+        .filter(f => `${f.name} ${f.material}`.toLowerCase().includes(q))
+        .forEach(f => {
+          const perKg = f.rollWeight > 0 ? (f.rollPrice / (f.rollWeight / 1000)) : 0;
+          const card = document.createElement("div");
+          card.className = "item-card";
+          card.innerHTML = `
+            <div>
+              <div style="display:flex; justify-content:space-between; align-items:center;">
+                <strong><span class="color-dot" style="background:${f.color}"></span>${f.name}</strong>
+                <span class="badge">${f.material}</span>
+              </div>
+              <div style="font-size:0.82rem; color:var(--text-muted); margin-top:5px;">
+                Rolo ${f.rollWeight}g: <strong>${formatBRL(f.rollPrice)}</strong> (${formatBRL(perKg)}/kg)
+              </div>
+              <div style="font-size:0.8rem; margin-top:4px; color:${f.stockGrams <= 150 ? "#fbbf24" : "#94a3b8"};">
+                Saldo: <strong>${f.stockGrams.toFixed(0)}g</strong>
+              </div>
+            </div>
+            <div style="display:flex; gap:6px;">
+              <button class="btn btn-secondary btn-sm" style="flex:1;" onclick="editFilament('${f.id}')">✏️ Editar</button>
+              <button class="btn btn-danger btn-sm" onclick="deleteFilament('${f.id}')">🗑️</button>
+            </div>
+          `;
+          grid.appendChild(card);
+        });
+    }
+
+    function deductStockFromCurrent() {
+      const wasteFactor = 1 + (Math.max(0, parseFloat(document.getElementById("extraWastePct").value) || 0) / 100);
+      amsRows.forEach(r => {
+        const f = filaments.find(x => x.id === r.filamentId);
+        if (f) f.stockGrams = Math.max(0, f.stockGrams - ((parseFloat(r.grams) || 0) * wasteFactor));
+      });
+      persistFilaments();
+      renderFilaments();
+      showToast("Estoque atualizado!");
+    }
+
+    // =========================================================================
+    // 7. PROJETOS SALVOS
+    // =========================================================================
+    function saveCurrentProject() {
+      const snapshot = {
+        id: "proj_" + Date.now(),
+        createdAt: new Date().toLocaleDateString("pt-BR"),
+        name: document.getElementById("projectName").value.trim() || "Peça 3D",
+        clientName: document.getElementById("clientName").value.trim(),
+        clientPhone: document.getElementById("clientPhone").value.trim(),
+        image: currentProjectImage,
+        amsRows: amsRows.map(r => {
+          const f = filaments.find(x => x.id === r.filamentId);
+          return {
+            filamentId: r.filamentId,
+            filamentName: f ? f.name : "Filamento",
+            costPerGram: getCostPerGram(r.filamentId),
+            grams: r.grams
+          };
+        }),
+        extraWastePct: parseFloat(document.getElementById("extraWastePct").value) || 0,
+        batchQty: parseInt(document.getElementById("batchQty").value, 10) || 1,
+        printHours: parseInt(document.getElementById("printHours").value, 10) || 0,
+        printMinutes: parseInt(document.getElementById("printMinutes").value, 10) || 0,
+        laborMinutes: parseFloat(document.getElementById("laborMinutes").value) || 0,
+        extraCost: parseFloat(document.getElementById("extraCost").value) || 0,
+        profitMargin: parseFloat(document.getElementById("profitMargin").value) || 100,
+        salesChannel: document.getElementById("salesChannel").value,
+        unitFinalPrice: lastCalc.unitFinalPrice || 0,
+        totalFinalPrice: lastCalc.totalFinalPrice || 0
+      };
+
+      projects.unshift(snapshot);
+      let res = persistProjects();
+      if (!res.ok) {
+        projects[0].image = "";
+        res = persistProjects();
+        if (res.ok) showToast("Memória cheia: projeto salvo sem a foto.");
+        else { projects.shift(); showToast("Sem espaço no navegador. Exporte backup."); return; }
+      } else {
+        showToast("Projeto salvo!");
+      }
+      renderProjects();
+    }
+
+    function loadProject(id) {
+      const p = projects.find(x => x.id === id);
+      if (!p) return;
+      document.getElementById("projectName").value = p.name || "";
+      document.getElementById("clientName").value = p.clientName || "";
+      document.getElementById("clientPhone").value = p.clientPhone || "";
+      setProjectImage(p.image || "");
+
+      amsRows = (p.amsRows || []).map((r, i) => {
+        const valid = ensureFilamentExists(r.filamentId, r.filamentName, r.costPerGram);
+        return { uid: "l_" + i + "_" + Date.now(), filamentId: valid.id, grams: r.grams };
+      });
+      if (!amsRows.length) addAmsRow(null, 20);
+      renderAmsRows();
+
+      document.getElementById("extraWastePct").value = p.extraWastePct || 0;
+      document.getElementById("batchQty").value = p.batchQty || 1;
+      document.getElementById("printHours").value = p.printHours || 0;
+      document.getElementById("printMinutes").value = p.printMinutes || 0;
+      document.getElementById("laborMinutes").value = p.laborMinutes || 0;
+      document.getElementById("extraCost").value = p.extraCost || 0;
+      document.getElementById("profitMargin").value = p.profitMargin || 100;
+      document.getElementById("salesChannel").value = p.salesChannel || "0";
+
+      calculate();
+      switchTab("calc");
+      showToast("Projeto carregado!");
+    }
+
+    function deleteProject(id) {
+      projects = projects.filter(p => p.id !== id);
+      persistProjects();
+      renderProjects();
+      showToast("Projeto excluído.");
+    }
+
+    function renderProjects() {
+      const q = (document.getElementById("searchProject").value || "").toLowerCase();
+      const grid = document.getElementById("projectsGrid");
+      grid.innerHTML = "";
+      const list = projects.filter(p => `${p.name} ${p.clientName || ""} ${p.clientPhone || ""}`.toLowerCase().includes(q));
+      if (!list.length) {
+        grid.innerHTML = `<p style="color:var(--text-muted); font-size:0.85rem;">Nenhum projeto salvo.</p>`;
+        return;
+      }
+      list.forEach(p => {
+        const card = document.createElement("div");
+        card.className = "item-card";
+        card.innerHTML = `
+          <div>
+            ${p.image ? `<img src="${p.image}" onclick="openLightbox(this.src)" style="width:100%; height:115px; object-fit:cover; border-radius:8px; margin-bottom:8px; cursor:zoom-in;" />` : ""}
+            <div style="display:flex; justify-content:space-between; gap:6px;">
+              <strong>${p.name}</strong>
+              <span style="font-size:0.74rem; color:var(--text-muted);">${p.createdAt}</span>
+            </div>
+            ${(p.clientName || p.clientPhone) ? `<div style="font-size:0.78rem; color:var(--accent); margin-top:3px;">👤 ${p.clientName || "Cliente"} ${p.clientPhone ? "• " + p.clientPhone : ""}</div>` : ""}
+            <div style="font-size:0.82rem; margin-top:5px;">
+              ${p.batchQty}x • Unit.: <strong style="color:var(--primary);">${formatBRL(p.unitFinalPrice)}</strong> • Total: <strong>${formatBRL(p.totalFinalPrice)}</strong>
+            </div>
+          </div>
+          <div style="display:flex; gap:6px;">
+            <button class="btn btn-primary btn-sm" style="flex:1;" onclick="loadProject('${p.id}')">📂 Abrir</button>
+            <button class="btn btn-danger btn-sm" onclick="deleteProject('${p.id}')">🗑️</button>
+          </div>
+        `;
+        grid.appendChild(card);
+      });
+    }
+
+    // =========================================================================
+    // 8. ORÇAMENTO WHATSAPP & IMPRESSÃO A4
+    // =========================================================================
+    function openQuoteOptionsModal() { document.getElementById("quoteModal").classList.add("open"); }
+    function closeQuoteModal() { document.getElementById("quoteModal").classList.remove("open"); }
+
+    function buildQuoteData() {
+      const studio = document.getElementById("studioName").value.trim() || "Impressão 3D";
+      const project = document.getElementById("projectName").value.trim() || "Peça Personalizada em Impressão 3D";
+      const clientName = document.getElementById("clientName").value.trim();
+      const clientPhone = document.getElementById("clientPhone").value.trim();
+      const delivery = document.getElementById("deliveryDays").value.trim() || "3 dias úteis";
+      const notes = document.getElementById("quoteNotes").value.trim();
+      const qty = lastCalc.batchQty || 1;
+      const unitPrice = formatBRL(lastCalc.unitFinalPrice || 0);
+      const totalPrice = formatBRL(lastCalc.totalFinalPrice || 0);
+
+      const greeting = clientName ? `Olá, *${clientName}*! Segue o orçamento:` : `Olá! Segue o orçamento:`;
+      const waText = [
+        `*${studio}*`,
+        greeting,
+        ``,
+        `📦 *Item:* ${project}`,
+        `🔢 *Quantidade:* ${qty} un.`,
+        `💵 *Unitário:* ${unitPrice}`,
+        `💰 *Total:* *${totalPrice}*`,
+        `⏱️ *Prazo:* ${delivery}`,
+        notes ? `📝 ${notes}` : ``
+      ].filter(Boolean).join("\n");
+
+      return { studio, project, clientName, clientPhone, delivery, notes, qty, unitPrice, totalPrice, waText };
+    }
+
+    function copyWhatsAppText() {
+      const { waText } = buildQuoteData();
+      if (navigator.clipboard?.writeText) {
+        navigator.clipboard.writeText(waText).then(() => showToast("Texto copiado!"));
+      }
+    }
+
+    function sendWhatsAppQuote() {
+      const { clientPhone, waText } = buildQuoteData();
+      const digits = (clientPhone || "").replace(/\D/g, "");
+      const phoneParam = digits.length >= 10 ? (digits.startsWith("55") ? digits : "55" + digits) : "";
+      const url = phoneParam
+        ? `https://wa.me/${phoneParam}?text=${encodeURIComponent(waText)}`
+        : `https://wa.me/?text=${encodeURIComponent(waText)}`;
+      window.open(url, "_blank", "noopener,noreferrer");
+    }
+
+    function printProposalWindow() {
+      saveMachineSettings();
+      const q = buildQuoteData();
+      const htmlDoc = `
+        <!DOCTYPE html>
+        <html lang="pt-BR">
+        <head>
+          <meta charset="UTF-8" />
+          <title>Orçamento - ${q.project}</title>
+          <style>
+            body { font-family: Arial, sans-serif; color: #1e293b; padding: 34px; max-width: 760px; margin: 0 auto; }
+            .top { display: flex; justify-content: space-between; border-bottom: 2px solid #10b981; padding-bottom: 12px; margin-bottom: 18px; }
+            h1 { margin: 0; font-size: 20px; }
+            .box { background: #f8fafc; border: 1px solid #cbd5e1; padding: 10px 14px; border-radius: 8px; margin-bottom: 16px; }
+            table { width: 100%; border-collapse: collapse; margin: 16px 0; }
+            th, td { border: 1px solid #cbd5e1; padding: 9px 11px; text-align: left; }
+            th { background: #f1f5f9; }
+            .total { font-size: 18px; font-weight: bold; color: #059669; text-align: right; }
+            img { max-width: 160px; max-height: 160px; border-radius: 8px; border: 1px solid #cbd5e1; margin-top: 8px; }
+          </style>
+        </head>
+        <body>
+          <div class="top">
+            <div><h1>${q.studio}</h1><div style="font-size:12px; color:#64748b;">Orçamento — Impressão 3D</div></div>
+            <div style="text-align:right; font-size:12px;"><strong>Data:</strong> ${new Date().toLocaleDateString("pt-BR")}<br/><strong>Prazo:</strong> ${q.delivery}</div>
+          </div>
+          ${(q.clientName || q.clientPhone) ? `<div class="box"><strong>Cliente:</strong> ${q.clientName || "-"} ${q.clientPhone ? "• " + q.clientPhone : ""}</div>` : ""}
+          ${currentProjectImage ? `<img src="${currentProjectImage}" alt="Produto" />` : ""}
+          <table>
+            <thead><tr><th>Descrição</th><th>Qtd.</th><th>Unitário</th><th>Subtotal</th></tr></thead>
+            <tbody><tr><td>${q.project}</td><td>${q.qty} un.</td><td>${q.unitPrice}</td><td><strong>${q.totalPrice}</strong></td></tr></tbody>
+          </table>
+          <div class="total">Total: ${q.totalPrice}</div>
+          <p style="margin-top:20px; font-size:12.5px; color:#475569;"><strong>Observações:</strong> ${q.notes}</p>
+          <script>window.onload = function() { window.print(); };<\/script>
+        </body>
+        </html>
+      `;
+      const win = window.open("", "_blank");
+      if (win) {
+        win.document.open();
+        win.document.write(htmlDoc);
+        win.document.close();
+      } else {
+        const blob = new Blob([htmlDoc], { type: "text/html;charset=utf-8" });
+        const a = document.createElement("a");
+        a.href = URL.createObjectURL(blob);
+        a.download = `orcamento_${q.project.toLowerCase().replace(/\s+/g, "_")}.html`;
+        a.click();
+        showToast("Proposta baixada em HTML.");
+      }
+    }
+
+    // =========================================================================
+    // 9. BACKUP JSON & INICIALIZAÇÃO
+    // =========================================================================
+    function exportBackup() {
+      const payload = { version: "3.0-compact", exportedAt: new Date().toISOString(), filaments, projects };
+      const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = `backup_precifica3d_${new Date().toISOString().slice(0, 10)}.json`;
+      a.click();
+      showToast("Backup exportado!");
+    }
+
+    function importBackup(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        try {
+          const data = JSON.parse(e.target.result);
+          if (Array.isArray(data.filaments) && data.filaments.length) { filaments = data.filaments; persistFilaments(); }
+          if (Array.isArray(data.projects)) { projects = data.projects; persistProjects(); }
+          renderFilaments();
+          renderProjects();
+          renderAmsRows();
+          calculate();
+          showToast("Backup restaurado!");
+        } catch (err) { showToast("Backup inválido."); }
+      };
+      reader.readAsText(file);
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+      loadState();
+      persistFilaments();
+      persistProjects();
+      addAmsRow(filaments[0].id, 30);
+      renderFilaments();
+      renderProjects();
+      calculate();
+
+      const dz = document.getElementById("3mfDropzone");
+      ["dragenter", "dragover"].forEach(ev => dz.addEventListener(ev, e => { e.preventDefault(); dz.classList.add("dragover"); }));
+      ["dragleave", "drop"].forEach(ev => dz.addEventListener(ev, e => { e.preventDefault(); dz.classList.remove("dragover"); }));
+      dz.addEventListener("drop", e => { if (e.dataTransfer.files?.[0]) handle3mfFile(e.dataTransfer.files[0]); });
+    });
+  </script>
+</body>
+</html>
